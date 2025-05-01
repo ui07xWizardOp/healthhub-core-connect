@@ -8,8 +8,13 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Pharmacy from "./pages/Pharmacy";
 import Laboratory from "./pages/Laboratory";
+import Customers from "./pages/Customers";
+import Inventory from "./pages/Inventory";
+import Employees from "./pages/Employees";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
+// Create a client
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -23,6 +28,10 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/pharmacy" element={<Pharmacy />} />
           <Route path="/laboratory" element={<Laboratory />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/employees" element={<Employees />} />
+          <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
