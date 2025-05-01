@@ -1,7 +1,7 @@
 
 import React from 'react';
 import FeatureCard from './FeatureCard';
-import { Medication, Flask, Users, UserCircle } from 'lucide-react';
+import { PillIcon, TestTube, Users, UserCircle } from 'lucide-react';
 
 const FeaturesSection: React.FC = () => {
   return (
@@ -16,12 +16,12 @@ const FeaturesSection: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
-            icon={<Medication size={24} />}
+            icon={<PillIcon size={24} />}
             title="Pharmacy Management"
             description="Manage inventory, prescriptions, and orders with our comprehensive pharmacy module."
           />
           <FeatureCard
-            icon={<Flask size={24} />}
+            icon={<TestTube size={24} />}
             title="Lab Management"
             description="Keep track of tests, results, and samples with our laboratory information system."
           />

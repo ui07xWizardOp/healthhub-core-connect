@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Medication, Flask, Users, ShoppingCart } from 'lucide-react';
+import { PillIcon, TestTube, Users, ShoppingCart } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   return (
@@ -13,7 +13,7 @@ const Dashboard: React.FC = () => {
         <Card className="bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-500">Total Medicines</CardTitle>
-            <Medication className="text-healthhub-orange h-5 w-5" />
+            <PillIcon className="text-healthhub-orange h-5 w-5" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">1,245</div>
@@ -24,7 +24,7 @@ const Dashboard: React.FC = () => {
         <Card className="bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-500">Lab Tests</CardTitle>
-            <Flask className="text-healthhub-orange h-5 w-5" />
+            <TestTube className="text-healthhub-orange h-5 w-5" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">587</div>
