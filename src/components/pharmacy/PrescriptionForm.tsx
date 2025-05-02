@@ -37,7 +37,7 @@ interface PrescriptionItem {
   quantity: string;
   instructions: string;
   id?: number; // For existing items
-  productName?: string; // Added to fix TypeScript error
+  productName?: string; // For displaying product name
   genericName?: string; // Added for completeness
 }
 
@@ -153,7 +153,7 @@ const PrescriptionForm = ({ prescription, onClose }: PrescriptionFormProps) => {
       
       setItems(data?.map(item => ({
         id: item.prescriptionitemid,
-        productid: item.productid?.toString(),
+        productid: item.productid?.toString() || '',
         dosage: item.dosage || '',
         frequency: item.frequency || '',
         duration: item.duration || '',
@@ -352,7 +352,7 @@ const PrescriptionForm = ({ prescription, onClose }: PrescriptionFormProps) => {
                     <SelectValue placeholder="Select patient" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="null">None</SelectItem>
                     {customers?.map((customer) => (
                       <SelectItem key={customer.userid} value={customer.userid.toString()}>
                         {customer.firstname} {customer.lastname}
@@ -373,7 +373,7 @@ const PrescriptionForm = ({ prescription, onClose }: PrescriptionFormProps) => {
                     <SelectValue placeholder="Select doctor" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="null">None</SelectItem>
                     {doctors?.map((doctor) => (
                       <SelectItem key={doctor.doctorid} value={doctor.doctorid.toString()}>
                         Dr. {doctor.firstname} {doctor.lastname}

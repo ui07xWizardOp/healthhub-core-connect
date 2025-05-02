@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Dialog, 
@@ -195,7 +194,7 @@ const MedicationForm = ({ medication, onClose }: MedicationFormProps) => {
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="null">None</SelectItem>
                     {categories?.map((category) => (
                       <SelectItem key={category.categoryid} value={category.categoryid.toString()}>
                         {category.categoryname}

@@ -21,41 +21,41 @@ import PrescriptionForm from '@/components/pharmacy/PrescriptionForm';
 import MedicationForm from '@/components/pharmacy/MedicationForm';
 
 interface User {
-  firstname?: string;
-  lastname?: string;
+  firstname?: string | null;
+  lastname?: string | null;
 }
 
 interface Prescription {
   prescriptionid: number;
-  customerid: number;
-  doctorid: number;
-  prescriptiondate: string;
-  expirydate: string;
+  customerid: number | null;
+  doctorid: number | null;
+  prescriptiondate: string | null;
+  expirydate: string | null;
   customer?: User | null;
   doctor?: User | null;
-  prescribingdoctor?: string;
+  prescribingdoctor?: string | null;
 }
 
 interface Sale {
   saleid: number;
-  saledate: string;
+  saledate: string | null;
   totalamount: number;
-  status: string;
-  paymentmethod?: string;
+  status: string | null;
+  paymentmethod?: string | null;
   customer?: User | null;
 }
 
 interface Medication {
   productid: number;
   productname: string;
-  genericname?: string;
-  categoryid?: number;
+  genericname?: string | null;
+  categoryid?: number | null;
   isactive: boolean;
-  requiresprescription?: boolean;
+  requiresprescription?: boolean | null;
   currentStock?: number;
   categories?: {
     categoryname: string;
-  };
+  } | null;
 }
 
 const Pharmacy = () => {
@@ -117,7 +117,7 @@ const Pharmacy = () => {
         .limit(50);
       
       if (error) throw error;
-      return data || [];
+      return (data || []) as Prescription[];
     }
   });
 
@@ -135,7 +135,7 @@ const Pharmacy = () => {
         .limit(10);
       
       if (error) throw error;
-      return data || [];
+      return (data || []) as Sale[];
     }
   });
 
@@ -336,7 +336,7 @@ const Pharmacy = () => {
                                 `Dr. ${prescription.doctor.firstname || ''} ${prescription.doctor.lastname || ''}` : 
                                 'N/A'}
                             </TableCell>
-                            <TableCell>{new Date(prescription.prescriptiondate).toLocaleDateString()}</TableCell>
+                            <TableCell>{prescription.prescriptiondate ? new Date(prescription.prescriptiondate).toLocaleDateString() : 'N/A'}</TableCell>
                             <TableCell>
                               {prescription.expirydate ? 
                                 new Date(prescription.expirydate).toLocaleDateString() : 
@@ -473,7 +473,7 @@ const Pharmacy = () => {
                                 `${sale.customer.firstname || 'Unknown'} ${sale.customer.lastname || 'Customer'}` : 
                                 'Walk-in Customer'}
                             </TableCell>
-                            <TableCell>{new Date(sale.saledate).toLocaleDateString()}</TableCell>
+                            <TableCell>{sale.saledate ? new Date(sale.saledate).toLocaleDateString() : 'N/A'}</TableCell>
                             <TableCell className="text-right">
                               {formatCurrency(sale.totalamount || 0)}
                             </TableCell>

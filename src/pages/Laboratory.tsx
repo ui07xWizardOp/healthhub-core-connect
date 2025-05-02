@@ -15,16 +15,16 @@ import LabTestForm from '@/components/laboratory/LabTestForm';
 import TestResultForm from '@/components/laboratory/TestResultForm';
 
 interface User {
-  firstname?: string;
-  lastname?: string;
+  firstname?: string | null;
+  lastname?: string | null;
 }
 
 interface LabOrder {
   orderid: number;
-  customerid: number;
-  orderdate: string;
+  customerid: number | null;
+  orderdate: string | null;
   totalamount: number;
-  status: string;
+  status: string | null;
   users?: User | null;
   customer?: User | null;
 }
@@ -32,13 +32,14 @@ interface LabOrder {
 interface LabTest {
   testid: number;
   testname: string;
-  categoryid?: number;
-  sampletype?: string;
+  categoryid?: number | null;
+  sampletype?: string | null;
   price: number;
   isactive: boolean;
+  testingmethod?: string | null;
   testcategories?: {
     categoryname: string;
-  }
+  } | null;
 }
 
 const Laboratory = () => {
@@ -80,7 +81,7 @@ const Laboratory = () => {
         .limit(10);
       
       if (error) throw error;
-      return data || [];
+      return (data || []) as LabOrder[];
     }
   });
 
@@ -299,10 +300,10 @@ const Laboratory = () => {
                                 : 'Unknown'
                               }
                             </TableCell>
-                            <TableCell>{new Date(order.orderdate).toLocaleDateString()}</TableCell>
+                            <TableCell>{order.orderdate ? new Date(order.orderdate).toLocaleDateString() : 'N/A'}</TableCell>
                             <TableCell>{formatCurrency(order.totalamount)}</TableCell>
                             <TableCell>
-                              <Badge className={getStatusBadgeColor(order.status)}>
+                              <Badge className={getStatusBadgeColor(order.status || '')}>
                                 {order.status || 'Processing'}
                               </Badge>
                             </TableCell>
