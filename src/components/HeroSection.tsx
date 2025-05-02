@@ -10,18 +10,18 @@ const HeroSection: React.FC = () => {
         <div className="flex flex-col lg:flex-row items-center justify-between">
           <div className="lg:max-w-2xl space-y-6 text-center lg:text-left">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in">
-              Manage Your Pharmacy & Lab with Ease
+              Your Healthcare, Simplified
             </h1>
             <p className="text-xl text-gray-600 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              HealthHub provides a comprehensive solution for managing pharmacy operations,
-              laboratory services, customers, and employees all in one platform.
+              Book appointments, schedule lab tests, and manage your health all in one place. 
+              We're here to make healthcare accessible and convenient for you and your family.
             </p>
             <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <Button asChild className="healthhub-button">
-                <Link to="/signup">Get Started</Link>
+                <Link to="/signup">Sign Up</Link>
               </Button>
               <Button variant="outline" asChild className="border-healthhub-orange text-healthhub-orange hover:bg-healthhub-orange/10">
-                <Link to="/demo">Request Demo</Link>
+                <Link to="/login">Log In</Link>
               </Button>
             </div>
           </div>
@@ -32,7 +32,7 @@ const HeroSection: React.FC = () => {
               <div className="bg-white p-4 rounded-2xl shadow-xl">
                 <img
                   src="/placeholder.svg"
-                  alt="HealthHub Dashboard"
+                  alt="Healthcare Services"
                   className="w-full max-w-md rounded-lg"
                 />
               </div>

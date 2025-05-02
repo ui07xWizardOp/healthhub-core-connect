@@ -32,6 +32,12 @@ const App = () => (
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/employees" element={<Employees />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/login" element={<NotFound />} /> {/* Placeholder until we implement auth */}
+          <Route path="/signup" element={<NotFound />} /> {/* Placeholder until we implement auth */}
+          <Route path="/services" element={<NotFound />} /> {/* Placeholder until implemented */}
+          <Route path="/doctors" element={<NotFound />} /> {/* Placeholder until implemented */}
+          <Route path="/lab-tests" element={<NotFound />} /> {/* Placeholder until implemented */}
+          <Route path="/contact" element={<NotFound />} /> {/* Placeholder until implemented */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

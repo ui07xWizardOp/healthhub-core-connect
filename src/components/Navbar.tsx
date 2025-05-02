@@ -22,20 +22,23 @@ const Navbar: React.FC = () => {
           
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/pharmacy" className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors">
-              Pharmacy
+            <Link to="/services" className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors">
+              Services
             </Link>
-            <Link to="/laboratory" className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors">
-              Laboratory
+            <Link to="/doctors" className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors">
+              Doctors
             </Link>
-            <Link to="/customers" className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors">
-              Customers
+            <Link to="/lab-tests" className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors">
+              Lab Tests
             </Link>
-            <Link to="/employees" className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors">
-              Employees
+            <Link to="/contact" className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors">
+              Contact
             </Link>
+            <Button asChild variant="outline" className="mr-2">
+              <Link to="/login">Login</Link>
+            </Button>
             <Button className="healthhub-button">
-              Login
+              <Link to="/signup">Sign Up</Link>
             </Button>
           </div>
           
@@ -56,35 +59,38 @@ const Navbar: React.FC = () => {
           <div className="md:hidden mt-4 pb-4 animate-fade-in">
             <div className="flex flex-col space-y-4">
               <Link 
-                to="/pharmacy" 
+                to="/services" 
                 className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors px-2 py-2"
                 onClick={() => setIsOpen(false)}
               >
-                Pharmacy
+                Services
               </Link>
               <Link 
-                to="/laboratory" 
+                to="/doctors" 
                 className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors px-2 py-2"
                 onClick={() => setIsOpen(false)}
               >
-                Laboratory
+                Doctors
               </Link>
               <Link 
-                to="/customers" 
+                to="/lab-tests" 
                 className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors px-2 py-2"
                 onClick={() => setIsOpen(false)}
               >
-                Customers
+                Lab Tests
               </Link>
               <Link 
-                to="/employees" 
+                to="/contact" 
                 className="font-medium text-gray-700 hover:text-healthhub-orange transition-colors px-2 py-2"
                 onClick={() => setIsOpen(false)}
               >
-                Employees
+                Contact
               </Link>
-              <Button className="healthhub-button w-full">
-                Login
+              <Button asChild variant="outline" className="w-full mb-2">
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button asChild className="healthhub-button w-full">
+                <Link to="/signup">Sign Up</Link>
               </Button>
             </div>
           </div>
