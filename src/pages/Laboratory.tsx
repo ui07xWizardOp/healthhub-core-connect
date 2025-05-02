@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '@/layouts/DashboardLayout';
@@ -24,7 +25,20 @@ interface LabOrder {
   orderdate: string;
   totalamount: number;
   status: string;
-  users?: User;
+  users?: User | null;
+  customer?: User | null;
+}
+
+interface LabTest {
+  testid: number;
+  testname: string;
+  categoryid?: number;
+  sampletype?: string;
+  price: number;
+  isactive: boolean;
+  testcategories?: {
+    categoryname: string;
+  }
 }
 
 const Laboratory = () => {
@@ -36,7 +50,7 @@ const Laboratory = () => {
   const { toast } = useToast();
   
   // Fetch lab tests
-  const { data: labtests, isLoading: loadingTests, refetch: refetchTests } = useQuery({
+  const { data: labtests, isLoading: loadingTests, refetch: refetchTests } = useQuery<LabTest[]>({
     queryKey: ['labtests'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -60,7 +74,7 @@ const Laboratory = () => {
         .from('laborders')
         .select(`
           *,
-          users:customerid(firstname, lastname)
+          customer:customerid(firstname, lastname)
         `)
         .order('orderdate', { ascending: false })
         .limit(10);
@@ -258,7 +272,7 @@ const Laboratory = () => {
               <CardContent>
                 {loadingOrders ? (
                   <div className="text-center py-8">Loading recent orders...</div>
-                ) : laborders?.length === 0 ? (
+                ) : laborders && laborders.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     No recent lab orders found
                   </div>
@@ -276,10 +290,15 @@ const Laboratory = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {laborders?.map((order) => (
+                        {laborders && laborders.map((order) => (
                           <TableRow key={order.orderid}>
                             <TableCell>LAB-{order.orderid}</TableCell>
-                            <TableCell>{order.users ? `${order.users.firstname || 'Unknown'} ${order.users.lastname || 'User'}` : 'Unknown'}</TableCell>
+                            <TableCell>
+                              {order.customer 
+                                ? `${order.customer.firstname || 'Unknown'} ${order.customer.lastname || 'User'}` 
+                                : 'Unknown'
+                              }
+                            </TableCell>
                             <TableCell>{new Date(order.orderdate).toLocaleDateString()}</TableCell>
                             <TableCell>{formatCurrency(order.totalamount)}</TableCell>
                             <TableCell>
@@ -323,7 +342,7 @@ const Laboratory = () => {
               <CardContent>
                 {loadingTests ? (
                   <div className="text-center py-8">Loading tests...</div>
-                ) : filteredTests?.length === 0 ? (
+                ) : filteredTests && filteredTests.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     No tests matching your search
                   </div>
@@ -341,7 +360,7 @@ const Laboratory = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredTests?.map((test) => (
+                        {filteredTests && filteredTests.map((test) => (
                           <TableRow key={test.testid}>
                             <TableCell className="font-medium">{test.testname}</TableCell>
                             <TableCell>{test.testcategories?.categoryname || 'Uncategorized'}</TableCell>

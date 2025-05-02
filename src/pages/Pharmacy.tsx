@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '@/layouts/DashboardLayout';
@@ -30,8 +31,8 @@ interface Prescription {
   doctorid: number;
   prescriptiondate: string;
   expirydate: string;
-  customer?: User;
-  doctor?: User;
+  customer?: User | null;
+  doctor?: User | null;
   prescribingdoctor?: string;
 }
 
@@ -41,7 +42,20 @@ interface Sale {
   totalamount: number;
   status: string;
   paymentmethod?: string;
-  customer?: User;
+  customer?: User | null;
+}
+
+interface Medication {
+  productid: number;
+  productname: string;
+  genericname?: string;
+  categoryid?: number;
+  isactive: boolean;
+  requiresprescription?: boolean;
+  currentStock?: number;
+  categories?: {
+    categoryname: string;
+  };
 }
 
 const Pharmacy = () => {
@@ -53,7 +67,7 @@ const Pharmacy = () => {
   const { toast } = useToast();
   
   // Fetch medications (products)
-  const { data: medications, isLoading: loadingMedications, refetch: refetchMedications } = useQuery({
+  const { data: medications, isLoading: loadingMedications, refetch: refetchMedications } = useQuery<Medication[]>({
     queryKey: ['medications'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -291,7 +305,7 @@ const Pharmacy = () => {
               <CardContent>
                 {loadingPrescriptions ? (
                   <div className="text-center py-8">Loading prescriptions...</div>
-                ) : prescriptions?.length === 0 ? (
+                ) : prescriptions && prescriptions.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     No prescriptions found
                   </div>
@@ -309,7 +323,7 @@ const Pharmacy = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {prescriptions?.map((prescription) => (
+                        {prescriptions && prescriptions.map((prescription) => (
                           <TableRow key={prescription.prescriptionid}>
                             <TableCell>PRE-{prescription.prescriptionid}</TableCell>
                             <TableCell>
@@ -368,7 +382,7 @@ const Pharmacy = () => {
               <CardContent>
                 {loadingMedications ? (
                   <div className="text-center py-8">Loading medications...</div>
-                ) : filteredMedications?.length === 0 ? (
+                ) : filteredMedications && filteredMedications.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     No medications matching your search
                   </div>
@@ -386,13 +400,13 @@ const Pharmacy = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredMedications?.map((medication) => (
+                        {filteredMedications && filteredMedications.map((medication) => (
                           <TableRow key={medication.productid} className={!medication.isactive ? 'bg-gray-50 opacity-70' : ''}>
                             <TableCell className="font-medium">{medication.productname}</TableCell>
                             <TableCell>{medication.genericname || 'N/A'}</TableCell>
                             <TableCell>{medication.categories?.categoryname || 'Uncategorized'}</TableCell>
                             <TableCell className={`text-right ${
-                              medication.currentStock <= (medication.reorderthreshold || 10) 
+                              medication.currentStock <= 10
                                 ? 'text-red-500 font-semibold' 
                                 : ''
                             }`}>
@@ -433,7 +447,7 @@ const Pharmacy = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {recentSales?.length === 0 ? (
+                {recentSales && recentSales.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     No recent sales found
                   </div>
@@ -451,7 +465,7 @@ const Pharmacy = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {recentSales?.map((sale) => (
+                        {recentSales && recentSales.map((sale) => (
                           <TableRow key={sale.saleid}>
                             <TableCell>SALE-{sale.saleid}</TableCell>
                             <TableCell>
