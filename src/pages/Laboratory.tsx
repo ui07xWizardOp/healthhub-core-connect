@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '@/layouts/DashboardLayout';
@@ -13,6 +12,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import LabTestForm from '@/components/laboratory/LabTestForm';
 import TestResultForm from '@/components/laboratory/TestResultForm';
+
+interface User {
+  firstname?: string;
+  lastname?: string;
+}
+
+interface LabOrder {
+  orderid: number;
+  customerid: number;
+  orderdate: string;
+  totalamount: number;
+  status: string;
+  users?: User;
+}
 
 const Laboratory = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -40,7 +53,7 @@ const Laboratory = () => {
   });
   
   // Fetch recent lab orders with customer information
-  const { data: laborders, isLoading: loadingOrders, refetch: refetchOrders } = useQuery({
+  const { data: laborders, isLoading: loadingOrders, refetch: refetchOrders } = useQuery<LabOrder[]>({
     queryKey: ['lab-orders'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -266,7 +279,7 @@ const Laboratory = () => {
                         {laborders?.map((order) => (
                           <TableRow key={order.orderid}>
                             <TableCell>LAB-{order.orderid}</TableCell>
-                            <TableCell>{order.users ? `${order.users.firstname} ${order.users.lastname}` : 'Unknown'}</TableCell>
+                            <TableCell>{order.users ? `${order.users.firstname || 'Unknown'} ${order.users.lastname || 'User'}` : 'Unknown'}</TableCell>
                             <TableCell>{new Date(order.orderdate).toLocaleDateString()}</TableCell>
                             <TableCell>{formatCurrency(order.totalamount)}</TableCell>
                             <TableCell>

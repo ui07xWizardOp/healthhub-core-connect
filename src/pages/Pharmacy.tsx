@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import DashboardLayout from '@/layouts/DashboardLayout';
@@ -19,6 +18,31 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import PrescriptionForm from '@/components/pharmacy/PrescriptionForm';
 import MedicationForm from '@/components/pharmacy/MedicationForm';
+
+interface User {
+  firstname?: string;
+  lastname?: string;
+}
+
+interface Prescription {
+  prescriptionid: number;
+  customerid: number;
+  doctorid: number;
+  prescriptiondate: string;
+  expirydate: string;
+  customer?: User;
+  doctor?: User;
+  prescribingdoctor?: string;
+}
+
+interface Sale {
+  saleid: number;
+  saledate: string;
+  totalamount: number;
+  status: string;
+  paymentmethod?: string;
+  customer?: User;
+}
 
 const Pharmacy = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -65,7 +89,7 @@ const Pharmacy = () => {
   });
   
   // Fetch prescriptions
-  const { data: prescriptions, isLoading: loadingPrescriptions, refetch: refetchPrescriptions } = useQuery({
+  const { data: prescriptions, isLoading: loadingPrescriptions, refetch: refetchPrescriptions } = useQuery<Prescription[]>({
     queryKey: ['prescriptions'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -84,7 +108,7 @@ const Pharmacy = () => {
   });
 
   // Fetch recent sales
-  const { data: recentSales } = useQuery({
+  const { data: recentSales } = useQuery<Sale[]>({
     queryKey: ['recent-sales'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -290,12 +314,12 @@ const Pharmacy = () => {
                             <TableCell>PRE-{prescription.prescriptionid}</TableCell>
                             <TableCell>
                               {prescription.customer ? 
-                                `${prescription.customer.firstname} ${prescription.customer.lastname}` : 
+                                `${prescription.customer.firstname || 'Unknown'} ${prescription.customer.lastname || 'User'}` : 
                                 prescription.prescribingdoctor || 'Unknown'}
                             </TableCell>
                             <TableCell>
                               {prescription.doctor ? 
-                                `Dr. ${prescription.doctor.firstname} ${prescription.doctor.lastname}` : 
+                                `Dr. ${prescription.doctor.firstname || ''} ${prescription.doctor.lastname || ''}` : 
                                 'N/A'}
                             </TableCell>
                             <TableCell>{new Date(prescription.prescriptiondate).toLocaleDateString()}</TableCell>
@@ -432,7 +456,7 @@ const Pharmacy = () => {
                             <TableCell>SALE-{sale.saleid}</TableCell>
                             <TableCell>
                               {sale.customer ? 
-                                `${sale.customer.firstname} ${sale.customer.lastname}` : 
+                                `${sale.customer.firstname || 'Unknown'} ${sale.customer.lastname || 'Customer'}` : 
                                 'Walk-in Customer'}
                             </TableCell>
                             <TableCell>{new Date(sale.saledate).toLocaleDateString()}</TableCell>

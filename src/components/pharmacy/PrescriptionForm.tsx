@@ -37,6 +37,8 @@ interface PrescriptionItem {
   quantity: string;
   instructions: string;
   id?: number; // For existing items
+  productName?: string; // Added to fix TypeScript error
+  genericName?: string; // Added for completeness
 }
 
 const PrescriptionForm = ({ prescription, onClose }: PrescriptionFormProps) => {
