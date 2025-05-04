@@ -3,9 +3,29 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
+export type UserProfile = {
+  userid: number;
+  firstname: string;
+  lastname: string;
+  email: string;
+  phone: string | null;
+  roles: string[];
+  isStaff?: boolean;
+  isDoctor?: boolean;
+  doctorId?: number;
+  specialization?: string;
+  qualification?: string;
+  isCustomer?: boolean;
+  customerId?: number;
+  dateOfBirth?: string;
+  gender?: string;
+  bloodGroup?: string;
+};
+
 type AuthContextType = {
   session: Session | null;
   user: User | null;
+  userProfile: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{
     error: any | null;
@@ -24,6 +44,12 @@ type AuthContextType = {
     error: any | null;
     data: any | null;
   }>;
+  hasRole: (role: string) => boolean;
+  isAdmin: () => boolean;
+  isStaff: () => boolean;
+  isDoctor: () => boolean;
+  isCustomer: () => boolean;
+  refreshProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,7 +57,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Function to fetch user profile data
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase.rpc('get_user_profile', { user_id: userId });
+      
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return;
+      }
+      
+      if (data) {
+        setUserProfile(data as UserProfile);
+      }
+    } catch (error) {
+      console.error('Error in fetchUserProfile:', error);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -40,6 +85,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('Auth state changed:', event);
         setSession(newSession);
         setUser(newSession?.user ?? null);
+        
+        if (newSession?.user) {
+          // Use setTimeout to avoid potential infinite recursion with Supabase
+          setTimeout(() => {
+            fetchUserProfile(newSession.user.id);
+          }, 0);
+        } else {
+          setUserProfile(null);
+        }
+        
+        if (event === 'SIGNED_OUT') {
+          setUserProfile(null);
+        }
+        
         setLoading(false);
       }
     );
@@ -48,6 +107,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
+      
+      if (currentSession?.user) {
+        fetchUserProfile(currentSession.user.id);
+      }
+      
       setLoading(false);
     });
 
@@ -55,6 +119,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       subscription.unsubscribe();
     };
   }, []);
+
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchUserProfile(user.id);
+    }
+  };
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -114,15 +184,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const hasRole = (role: string): boolean => {
+    if (!userProfile || !userProfile.roles) return false;
+    return userProfile.roles.includes(role);
+  };
+
+  const isAdmin = (): boolean => {
+    return hasRole('Admin');
+  };
+
+  const isStaff = (): boolean => {
+    return hasRole('Staff') || isAdmin();
+  };
+
+  const isDoctor = (): boolean => {
+    return !!userProfile?.isDoctor;
+  };
+
+  const isCustomer = (): boolean => {
+    return !!userProfile?.isCustomer;
+  };
+
   const value = {
     session,
     user,
+    userProfile,
     loading,
     signIn,
     signUp,
     signOut,
     resetPassword,
-    updatePassword
+    updatePassword,
+    hasRole,
+    isAdmin,
+    isStaff,
+    isDoctor,
+    isCustomer,
+    refreshProfile
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

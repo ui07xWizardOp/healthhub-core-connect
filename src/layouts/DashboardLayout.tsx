@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   SidebarProvider,
   Sidebar,
@@ -19,9 +19,14 @@ import {
   TestTube, 
   ShoppingCart, 
   User,
-  Settings
+  Settings,
+  LogOut
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { usePermissions } from '@/contexts/PermissionsContext';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -30,44 +35,34 @@ interface DashboardLayoutProps {
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const location = useLocation();
   const currentPath = location.pathname;
+  const { userProfile, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { getAvailableRoutes } = usePermissions();
 
-  const navigationItems = [
-    { 
-      name: 'Dashboard', 
-      path: '/dashboard', 
-      icon: LayoutDashboard 
-    },
-    { 
-      name: 'Pharmacy', 
-      path: '/pharmacy', 
-      icon: PillIcon 
-    },
-    { 
-      name: 'Laboratory', 
-      path: '/laboratory', 
-      icon: TestTube 
-    },
-    { 
-      name: 'Customers', 
-      path: '/customers', 
-      icon: Users 
-    },
-    { 
-      name: 'Inventory', 
-      path: '/inventory', 
-      icon: ShoppingCart 
-    },
-    { 
-      name: 'Employees', 
-      path: '/employees', 
-      icon: User 
-    },
-    { 
-      name: 'Settings', 
-      path: '/settings', 
-      icon: Settings 
-    },
-  ];
+  // Get available routes based on user permissions
+  const availableRoutes = getAvailableRoutes();
+
+  // Map icon strings to components
+  const iconMap: Record<string, React.ElementType> = {
+    'LayoutDashboard': LayoutDashboard,
+    'PillIcon': PillIcon,
+    'TestTube': TestTube,
+    'Users': Users,
+    'ShoppingCart': ShoppingCart,
+    'User': User,
+    'Settings': Settings
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success('Successfully logged out');
+      navigate('/');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      toast.error('Failed to log out');
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -82,20 +77,23 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
-              {navigationItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={currentPath === item.path}
-                    tooltip={item.name}
-                  >
-                    <Link to={item.path}>
-                      <item.icon />
-                      <span>{item.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {availableRoutes.map((route) => {
+                const IconComponent = iconMap[route.icon];
+                return (
+                  <SidebarMenuItem key={route.path}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={currentPath === route.path}
+                      tooltip={route.name}
+                    >
+                      <Link to={route.path}>
+                        {IconComponent && <IconComponent />}
+                        <span>{route.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter className="border-t border-border p-4">
@@ -104,12 +102,29 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <User className="h-4 w-4 text-healthhub-orange" />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-medium">Admin User</span>
-                <span className="text-xs text-muted-foreground">admin@healthhub.com</span>
+                <span className="text-sm font-medium">
+                  {userProfile ? `${userProfile.firstname} ${userProfile.lastname}` : 'User'}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {userProfile?.roles?.join(', ') || 'No role assigned'}
+                </span>
               </div>
-              <Button variant="ghost" size="icon" className="ml-auto">
-                <Settings className="h-4 w-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="ml-auto">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </SidebarFooter>
         </Sidebar>
