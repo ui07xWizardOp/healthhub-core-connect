@@ -63,9 +63,10 @@ const EmployeeForm = ({ employee, onClose }: EmployeeFormProps) => {
           
         if (updateError) throw updateError;
       } else {
+        // Fix: Don't pass an array for insert, just pass the object directly
         const { error: insertError } = await supabase
           .from('users')
-          .insert([dataToSubmit]);
+          .insert(dataToSubmit);
           
         if (insertError) throw insertError;
       }

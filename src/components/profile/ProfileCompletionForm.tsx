@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -176,7 +175,8 @@ const ProfileCompletionForm: React.FC = () => {
         p_last_name: values.lastName,
         p_phone: values.phone || null,
         p_profile_picture: profilePictureUrl,
-        p_date_of_birth: values.dateOfBirth ? new Date(values.dateOfBirth) : null,
+        // Fix: Convert date to string before sending to API
+        p_date_of_birth: values.dateOfBirth ? values.dateOfBirth : null,
         p_gender: values.gender || null,
         p_blood_group: values.bloodGroup || null,
         p_emergency_contact: values.emergencyContact || null,

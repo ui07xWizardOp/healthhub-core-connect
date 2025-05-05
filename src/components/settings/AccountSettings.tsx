@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -156,7 +155,7 @@ const AccountSettings: React.FC = () => {
         p_last_name: values.lastName,
         p_phone: values.phone || null,
         p_profile_picture: profilePictureUrl,
-        p_date_of_birth: values.dateOfBirth ? new Date(values.dateOfBirth) : null,
+        p_date_of_birth: values.dateOfBirth ? values.dateOfBirth : null,
         p_gender: values.gender || null,
         p_blood_group: values.bloodGroup || null,
         p_emergency_contact: values.emergencyContact || null,
