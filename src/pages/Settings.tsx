@@ -2,13 +2,13 @@
 import React, { useState } from 'react';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ProfileSettings from '@/components/settings/ProfileSettings';
+import AccountSettings from '@/components/settings/AccountSettings';
 import SecuritySettings from '@/components/settings/SecuritySettings';
 import NotificationSettings from '@/components/settings/NotificationSettings';
-import { UserCog, Settings as SettingsIcon, Bell } from 'lucide-react';
+import { User, Settings as SettingsIcon, Bell } from 'lucide-react';
 
 const Settings = () => {
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState("account");
   
   return (
     <DashboardLayout>
@@ -17,9 +17,9 @@ const Settings = () => {
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 bg-healthhub-blue/20">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <UserCog className="h-4 w-4" />
-              <span>Profile</span>
+            <TabsTrigger value="account" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span>Account</span>
             </TabsTrigger>
             <TabsTrigger value="security" className="flex items-center gap-2">
               <SettingsIcon className="h-4 w-4" />
@@ -32,8 +32,8 @@ const Settings = () => {
           </TabsList>
           
           <div className="w-full max-w-4xl">
-            <TabsContent value="profile" className="mt-0">
-              <ProfileSettings />
+            <TabsContent value="account" className="mt-0">
+              <AccountSettings />
             </TabsContent>
             
             <TabsContent value="security" className="mt-0">

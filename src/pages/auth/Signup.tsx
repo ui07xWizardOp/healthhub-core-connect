@@ -60,7 +60,8 @@ const Signup: React.FC = () => {
         toast.error(error.message || 'Failed to sign up');
       } else {
         toast.success('Successfully signed up! Please check your email for verification.');
-        navigate('/login');
+        // Redirect to profile completion page instead of login
+        navigate('/complete-profile');
       }
     } catch (error: any) {
       toast.error(error.message || 'An unexpected error occurred');

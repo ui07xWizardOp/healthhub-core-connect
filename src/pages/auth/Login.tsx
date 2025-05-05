@@ -20,7 +20,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
-  const { signIn } = useAuth();
+  const { signIn, isProfileComplete } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +46,13 @@ const Login: React.FC = () => {
         toast.error(error.message || 'Failed to sign in');
       } else {
         toast.success('Successfully signed in!');
-        navigate(from, { replace: true });
+        
+        // Check if profile is complete before redirecting
+        if (!isProfileComplete()) {
+          navigate('/complete-profile', { replace: true });
+        } else {
+          navigate(from, { replace: true });
+        }
       }
     } catch (error: any) {
       toast.error(error.message || 'An unexpected error occurred');

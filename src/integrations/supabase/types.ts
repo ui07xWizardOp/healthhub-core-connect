@@ -210,6 +210,7 @@ export type Database = {
           gender: string | null
           insuranceinfo: string | null
           medicalhistory: string | null
+          preferences: Json | null
         }
         Insert: {
           bloodgroup?: string | null
@@ -219,6 +220,7 @@ export type Database = {
           gender?: string | null
           insuranceinfo?: string | null
           medicalhistory?: string | null
+          preferences?: Json | null
         }
         Update: {
           bloodgroup?: string | null
@@ -228,6 +230,7 @@ export type Database = {
           gender?: string | null
           insuranceinfo?: string | null
           medicalhistory?: string | null
+          preferences?: Json | null
         }
         Relationships: [
           {
@@ -1781,6 +1784,8 @@ export type Database = {
           lastname: string
           passwordhash: string
           phone: string | null
+          profile_completed: boolean | null
+          profile_picture: string | null
           userid: number
           username: string
         }
@@ -1794,7 +1799,9 @@ export type Database = {
           lastname: string
           passwordhash: string
           phone?: string | null
-          userid?: number
+          profile_completed?: boolean | null
+          profile_picture?: string | null
+          userid: number
           username: string
         }
         Update: {
@@ -1807,6 +1814,8 @@ export type Database = {
           lastname?: string
           passwordhash?: string
           phone?: string | null
+          profile_completed?: boolean | null
+          profile_picture?: string | null
           userid?: number
           username?: string
         }
@@ -1821,6 +1830,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: Json
       }
+      get_user_profile_details: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       get_user_roles: {
         Args: { user_id: string }
         Returns: {
@@ -1830,6 +1843,21 @@ export type Database = {
       has_role: {
         Args: { user_id: string; required_role: string }
         Returns: boolean
+      }
+      update_user_profile: {
+        Args: {
+          p_user_id: string
+          p_first_name: string
+          p_last_name: string
+          p_phone: string
+          p_profile_picture?: string
+          p_date_of_birth?: string
+          p_gender?: string
+          p_blood_group?: string
+          p_emergency_contact?: string
+          p_preferences?: Json
+        }
+        Returns: Json
       }
     }
     Enums: {

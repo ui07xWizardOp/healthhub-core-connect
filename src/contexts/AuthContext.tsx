@@ -20,6 +20,14 @@ export type UserProfile = {
   dateOfBirth?: string;
   gender?: string;
   bloodGroup?: string;
+  emergencyContact?: string;
+  profile_picture?: string;
+  profile_completed?: boolean;
+  preferences?: {
+    emailNotifications?: boolean;
+    smsNotifications?: boolean;
+    [key: string]: any;
+  };
 };
 
 type AuthContextType = {
@@ -50,6 +58,7 @@ type AuthContextType = {
   isDoctor: () => boolean;
   isCustomer: () => boolean;
   refreshProfile: () => Promise<void>;
+  isProfileComplete: () => boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -63,15 +72,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Function to fetch user profile data
   const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase.rpc('get_user_profile', { user_id: userId });
+      // Use the get_user_profile_details function for enhanced profile details
+      const { data, error } = await supabase.rpc('get_user_profile_details', { p_user_id: userId });
       
       if (error) {
         console.error('Error fetching user profile:', error);
         return;
       }
       
-      if (data) {
-        setUserProfile(data as UserProfile);
+      if (data && data.success) {
+        // Remove success flag and use the rest of the data
+        const { success, ...profileData } = data;
+        setUserProfile(profileData as UserProfile);
       }
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
@@ -124,6 +136,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) {
       await fetchUserProfile(user.id);
     }
+  };
+
+  const isProfileComplete = () => {
+    return !!userProfile?.profile_completed;
   };
 
   const signIn = async (email: string, password: string) => {
@@ -220,7 +236,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isStaff,
     isDoctor,
     isCustomer,
-    refreshProfile
+    refreshProfile,
+    isProfileComplete
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
