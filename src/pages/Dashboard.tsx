@@ -6,14 +6,15 @@ import AdminDashboard from '@/components/dashboard/AdminDashboard';
 import StaffDashboard from '@/components/dashboard/StaffDashboard';
 import LabTechnicianDashboard from '@/components/dashboard/LabTechnicianDashboard';
 import CustomerDashboard from '@/components/dashboard/CustomerDashboard';
+import DashboardSelector from '@/components/dashboard/DashboardSelector';
 
 const Dashboard: React.FC = () => {
   const { userProfile, isAdmin, isStaff, isDoctor, isCustomer, hasRole } = useAuth();
 
   const renderDashboardByRole = () => {
-    // Admin gets priority view if they have multiple roles
+    // Admin gets their special dashboard selector
     if (isAdmin()) {
-      return <AdminDashboard />;
+      return <DashboardSelector />;
     }
 
     // Staff dashboard for staff users and doctors (as they are also staff)
