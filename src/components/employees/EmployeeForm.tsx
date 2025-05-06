@@ -26,7 +26,12 @@ const employeeFormSchema = z.object({
   isactive: z.boolean().default(true),
 });
 
-const EmployeeForm = ({ employee }: { employee?: any }) => {
+interface EmployeeFormProps {
+  employee?: any;
+  onClose?: () => void;
+}
+
+const EmployeeForm = ({ employee, onClose }: EmployeeFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -90,25 +95,61 @@ const EmployeeForm = ({ employee }: { employee?: any }) => {
           
         if (updateError) throw updateError;
       } else {
-        // Fix: Need to generate a userid for new users
-        // Since we can't actually generate a proper userid here (that's done by the database),
-        // we'll modify our insert approach
-        
-        // Insert into users table using RPC function instead of direct insert
-        // This assumes you have a function `create_user` in your database
-        const { error: insertError } = await supabase.rpc('create_user', {
-          p_firstname: values.firstname,
-          p_lastname: values.lastname,
-          p_email: values.email,
-          p_phone: values.phone || null,
-          p_address: values.address || null,
-          p_username: values.username,
-          p_passwordhash: values.password,
-          p_role: values.role,
-          p_isactive: values.isactive
-        });
+        // Fix: Instead of using RPC, we'll directly insert the user data
+        // This avoids the TypeScript error with the RPC function
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert({
+            firstname: values.firstname,
+            lastname: values.lastname,
+            email: values.email,
+            phone: values.phone || null,
+            address: values.address || null,
+            username: values.username,
+            passwordhash: values.password,
+            isactive: values.isactive
+          });
         
         if (insertError) throw insertError;
+        
+        // Get the created user
+        const { data: newUser, error: fetchError } = await supabase
+          .from('users')
+          .select('userid')
+          .eq('username', values.username)
+          .single();
+        
+        if (fetchError) throw fetchError;
+        
+        // Get role ID
+        const { data: roleData, error: roleError } = await supabase
+          .from('userroles')
+          .select('roleid')
+          .eq('rolename', values.role)
+          .single();
+        
+        if (roleError) throw roleError;
+        
+        // Add role mapping
+        const { error: mappingError } = await supabase
+          .from('userrolemapping')
+          .insert({
+            userid: newUser.userid,
+            roleid: roleData.roleid
+          });
+        
+        if (mappingError) throw mappingError;
+        
+        // If customer role, create a customer profile
+        if (values.role === 'Customer') {
+          const { error: profileError } = await supabase
+            .from('customerprofiles')
+            .insert({
+              customerid: newUser.userid
+            });
+          
+          if (profileError) throw profileError;
+        }
       }
       
       toast({
@@ -116,7 +157,11 @@ const EmployeeForm = ({ employee }: { employee?: any }) => {
         description: `Employee ${employee ? 'updated' : 'created'} successfully`
       });
       
-      navigate('/employees');
+      if (onClose) {
+        onClose();
+      } else {
+        navigate('/employees');
+      }
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -293,7 +338,7 @@ const EmployeeForm = ({ employee }: { employee?: any }) => {
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => navigate('/employees')}
+              onClick={onClose || (() => navigate('/employees'))}
             >
               Cancel
             </Button>
