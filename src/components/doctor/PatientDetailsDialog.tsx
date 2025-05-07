@@ -1,41 +1,44 @@
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTabs,
-  DialogTab
 } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  CalendarDays, 
-  ClipboardList, 
-  Clock, 
+  User, 
+  Calendar, 
   FileText, 
   Pill, 
-  TestTube, 
-  User 
+  TestTube,
+  ClipboardList 
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+
+interface Patient {
+  customerid: number;
+  firstname: string;
+  lastname: string;
+  gender?: string;
+  dateofbirth?: string;
+  bloodgroup?: string;
+  lastvisit?: string;
+}
 
 interface PatientDetailsDialogProps {
-  patient: {
-    customerid: number;
-    firstname: string;
-    lastname: string;
-    gender?: string;
-    dateofbirth?: string;
-    bloodgroup?: string;
-  };
+  patient: Patient;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -45,10 +48,39 @@ const PatientDetailsDialog: React.FC<PatientDetailsDialogProps> = ({
   open,
   onOpenChange
 }) => {
-  const [activeTab, setActiveTab] = useState<string>('overview');
-  
+  const [activeTab, setActiveTab] = useState('overview');
+
+  // Fetch patient prescriptions
+  const { data: prescriptions, isLoading: isPrescriptionsLoading } = useQuery({
+    queryKey: ['patient-prescriptions', patient.customerid],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('prescriptions')
+        .select(`
+          prescriptionid,
+          prescriptiondate,
+          expirydate,
+          prescribingdoctor,
+          doctors!inner (firstname, lastname),
+          prescriptionitems (
+            prescriptionitemid,
+            products!inner (productname),
+            dosage,
+            frequency,
+            duration
+          )
+        `)
+        .eq('customerid', patient.customerid)
+        .order('prescriptiondate', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: open && patient?.customerid !== undefined
+  });
+
   // Fetch patient visits
-  const { data: visits, isLoading: visitsLoading } = useQuery({
+  const { data: visits, isLoading: isVisitsLoading } = useQuery({
     queryKey: ['patient-visits', patient.customerid],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -60,81 +92,34 @@ const PatientDetailsDialog: React.FC<PatientDetailsDialogProps> = ({
           diagnosis,
           treatment,
           notes,
-          followupdate,
-          doctors (
-            firstname,
-            lastname
-          )
+          doctors!inner (firstname, lastname),
+          followupdate
         `)
         .eq('customerid', patient.customerid)
         .order('visitdate', { ascending: false });
       
       if (error) throw error;
       return data || [];
-    }
+    },
+    enabled: open && patient?.customerid !== undefined
   });
-  
-  // Fetch patient prescriptions
-  const { data: prescriptions, isLoading: prescriptionsLoading } = useQuery({
-    queryKey: ['patient-prescriptions', patient.customerid],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('prescriptions')
-        .select(`
-          prescriptionid,
-          prescriptiondate,
-          expirydate,
-          doctors (
-            firstname,
-            lastname
-          ),
-          prescribingdoctor,
-          prescriptionitems (
-            prescriptionitemid,
-            dosage,
-            frequency,
-            duration,
-            instructions,
-            products (
-              productname,
-              genericname
-            )
-          )
-        `)
-        .eq('customerid', patient.customerid)
-        .order('prescriptiondate', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    }
-  });
-  
-  // Fetch patient lab results
-  const { data: labResults, isLoading: labResultsLoading } = useQuery({
-    queryKey: ['patient-lab-results', patient.customerid],
+
+  // Fetch patient lab orders
+  const { data: labOrders, isLoading: isLabOrdersLoading } = useQuery({
+    queryKey: ['patient-lab-orders', patient.customerid],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('laborders')
         .select(`
           orderid,
           orderdate,
+          status,
+          referredby,
           laborderitems (
             orderitemid,
-            status,
-            labtests (
-              testid,
-              testname
-            ),
-            testpanels (
-              panelid,
-              panelname
-            ),
-            testresults (
-              resultid,
-              result,
-              resultnotes,
-              isabnormal
-            )
+            labtests (testname),
+            testpanels (panelname),
+            status
           )
         `)
         .eq('customerid', patient.customerid)
@@ -142,334 +127,274 @@ const PatientDetailsDialog: React.FC<PatientDetailsDialogProps> = ({
       
       if (error) throw error;
       return data || [];
-    }
+    },
+    enabled: open && patient?.customerid !== undefined
   });
-  
-  // Calculate age from date of birth
-  const calculateAge = (dateOfBirth: string): number => {
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    
-    return age;
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Patient: {patient.firstname} {patient.lastname}
+          <DialogTitle className="text-xl flex items-center gap-2">
+            <User className="h-5 w-5" /> 
+            {patient.firstname} {patient.lastname}
           </DialogTitle>
         </DialogHeader>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow flex flex-col">
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="overview">
-              <ClipboardList className="h-4 w-4 mr-2" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="prescriptions">
-              <Pill className="h-4 w-4 mr-2" />
-              Prescriptions
-            </TabsTrigger>
-            <TabsTrigger value="lab-results">
-              <TestTube className="h-4 w-4 mr-2" />
-              Lab Results
-            </TabsTrigger>
+
+        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mt-4">
+          <TabsList className="grid grid-cols-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
+            <TabsTrigger value="visits">Visits</TabsTrigger>
+            <TabsTrigger value="lab">Lab Results</TabsTrigger>
           </TabsList>
           
-          <ScrollArea className="flex-grow">
-            <TabsContent value="overview" className="m-0 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardContent className="p-4">
-                    <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Patient Details
-                    </h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                        <div className="text-gray-500">Full Name</div>
-                        <div>{patient.firstname} {patient.lastname}</div>
-                        
-                        <div className="text-gray-500">Gender</div>
-                        <div>{patient.gender || 'Not specified'}</div>
-                        
-                        <div className="text-gray-500">Date of Birth</div>
-                        <div>
-                          {patient.dateofbirth 
-                            ? `${format(new Date(patient.dateofbirth), 'MMM d, yyyy')} (${calculateAge(patient.dateofbirth)} years)`
-                            : 'Not specified'}
-                        </div>
-                        
-                        <div className="text-gray-500">Blood Group</div>
-                        <div>{patient.bloodgroup || 'Not specified'}</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardContent className="p-4">
-                    <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
-                      <CalendarDays className="h-4 w-4" />
-                      Visit History
-                    </h3>
-                    
-                    {visitsLoading ? (
-                      <div className="animate-pulse space-y-2">
-                        <div className="h-4 bg-gray-100 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-100 rounded w-1/2"></div>
-                      </div>
-                    ) : visits && visits.length > 0 ? (
-                      <div className="space-y-2 text-sm">
-                        <div className="font-medium">Latest Visits:</div>
-                        <div className="space-y-1">
-                          {visits.slice(0, 3).map((visit) => (
-                            <div key={visit.visitid} className="flex justify-between">
-                              <div>{format(new Date(visit.visitdate), 'MMM d, yyyy')}</div>
-                              <div>{visit.diagnosis || 'No diagnosis recorded'}</div>
+          <TabsContent value="overview" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Patient Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Date of Birth</p>
+                    <p>{patient.dateofbirth ? format(new Date(patient.dateofbirth), 'MMM d, yyyy') : 'Not recorded'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Gender</p>
+                    <p>{patient.gender || 'Not recorded'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Blood Group</p>
+                    <p>{patient.bloodgroup || 'Not recorded'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Last Visit</p>
+                    <p>{patient.lastvisit ? format(new Date(patient.lastvisit), 'MMM d, yyyy') : 'No prior visits'}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="prescriptions" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Prescriptions</CardTitle>
+                <CardDescription>Medication history</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isPrescriptionsLoading ? (
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-10 bg-gray-100 w-full rounded"></div>
+                    <div className="h-10 bg-gray-100 w-full rounded"></div>
+                  </div>
+                ) : prescriptions && prescriptions.length > 0 ? (
+                  <div className="space-y-4">
+                    {prescriptions.map((prescription: any) => (
+                      <Card key={prescription.prescriptionid} className="bg-gray-50">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <div className="font-medium flex items-center gap-2">
+                                <Calendar className="h-4 w-4" />
+                                {format(new Date(prescription.prescriptiondate), 'MMM d, yyyy')}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {prescription.doctors ? 
+                                  `Dr. ${prescription.doctors.firstname} ${prescription.doctors.lastname}` : 
+                                  prescription.prescribingdoctor || 'Unknown doctor'}
+                              </div>
                             </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-sm text-gray-500">No visit history found</div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <Card>
-                <CardContent className="p-4">
-                  <h3 className="text-sm font-medium mb-2">Medical History</h3>
-                  
-                  {visitsLoading ? (
-                    <div className="animate-pulse space-y-3">
-                      <div className="h-20 bg-gray-100 rounded w-full"></div>
-                    </div>
-                  ) : visits && visits.length > 0 ? (
-                    <div className="space-y-4">
-                      {visits.map((visit) => (
-                        <div key={visit.visitid} className="border-b pb-4 last:border-b-0 last:pb-0">
-                          <div className="flex justify-between mb-2">
-                            <div className="font-medium">{format(new Date(visit.visitdate), 'MMMM d, yyyy')}</div>
-                            <div className="text-gray-500 text-sm">
-                              Dr. {visit.doctors?.firstname} {visit.doctors?.lastname}
+                            <div className="text-sm text-gray-600">
+                              Expires: {prescription.expirydate ? 
+                                format(new Date(prescription.expirydate), 'MMM d, yyyy') : 
+                                'Not specified'}
                             </div>
                           </div>
                           
-                          {visit.chiefcomplaint && (
-                            <div className="mb-2">
-                              <div className="text-sm font-medium text-gray-500">Chief Complaint</div>
-                              <div>{visit.chiefcomplaint}</div>
+                          {prescription.prescriptionitems && prescription.prescriptionitems.length > 0 && (
+                            <div className="border rounded-md overflow-hidden mt-2">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>Medication</TableHead>
+                                    <TableHead>Dosage</TableHead>
+                                    <TableHead>Frequency</TableHead>
+                                    <TableHead>Duration</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {prescription.prescriptionitems.map((item: any) => (
+                                    <TableRow key={item.prescriptionitemid}>
+                                      <TableCell>{item.products.productname}</TableCell>
+                                      <TableCell>{item.dosage || '-'}</TableCell>
+                                      <TableCell>{item.frequency || '-'}</TableCell>
+                                      <TableCell>{item.duration || '-'}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
                             </div>
                           )}
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                            {visit.diagnosis && (
-                              <div>
-                                <div className="text-sm font-medium text-gray-500">Diagnosis</div>
-                                <div>{visit.diagnosis}</div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    No prescription records found
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="visits" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Visit History</CardTitle>
+                <CardDescription>Past medical visits</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isVisitsLoading ? (
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-24 bg-gray-100 w-full rounded"></div>
+                    <div className="h-24 bg-gray-100 w-full rounded"></div>
+                  </div>
+                ) : visits && visits.length > 0 ? (
+                  <div className="space-y-4">
+                    {visits.map((visit: any) => (
+                      <Card key={visit.visitid} className="bg-gray-50">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <div className="font-medium flex items-center gap-2">
+                                <Calendar className="h-4 w-4" />
+                                {format(new Date(visit.visitdate), 'MMM d, yyyy')}
                               </div>
-                            )}
-                            
-                            {visit.treatment && (
-                              <div>
-                                <div className="text-sm font-medium text-gray-500">Treatment</div>
-                                <div>{visit.treatment}</div>
+                              <div className="text-sm text-gray-600">
+                                Dr. {visit.doctors.firstname} {visit.doctors.lastname}
+                              </div>
+                            </div>
+                            {visit.followupdate && (
+                              <div className="text-sm text-gray-600">
+                                Follow-up: {format(new Date(visit.followupdate), 'MMM d, yyyy')}
                               </div>
                             )}
                           </div>
                           
-                          {visit.notes && (
-                            <div className="mt-2">
-                              <div className="text-sm font-medium text-gray-500">Notes</div>
-                              <div>{visit.notes}</div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Chief Complaint</p>
+                              <p className="text-sm">{visit.chiefcomplaint || 'Not recorded'}</p>
                             </div>
-                          )}
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Diagnosis</p>
+                              <p className="text-sm">{visit.diagnosis || 'Not recorded'}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Treatment</p>
+                              <p className="text-sm">{visit.treatment || 'Not recorded'}</p>
+                            </div>
+                            {visit.notes && (
+                              <div>
+                                <p className="text-sm font-medium text-gray-500">Notes</p>
+                                <p className="text-sm">{visit.notes}</p>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    No visit records found
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="lab" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Laboratory Results</CardTitle>
+                <CardDescription>Test results history</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLabOrdersLoading ? (
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-24 bg-gray-100 w-full rounded"></div>
+                    <div className="h-24 bg-gray-100 w-full rounded"></div>
+                  </div>
+                ) : labOrders && labOrders.length > 0 ? (
+                  <div className="space-y-4">
+                    {labOrders.map((order: any) => (
+                      <Card key={order.orderid} className="bg-gray-50">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <div className="font-medium flex items-center gap-2">
+                                <TestTube className="h-4 w-4" />
+                                Lab Order #{order.orderid} - {format(new Date(order.orderdate), 'MMM d, yyyy')}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                Referred by: {order.referredby || 'Not specified'}
+                              </div>
+                            </div>
+                            <div className={`text-sm font-medium ${
+                              order.status === 'Completed' ? 'text-green-600' :
+                              order.status === 'InProcess' ? 'text-amber-600' :
+                              'text-blue-600'
+                            }`}>
+                              {order.status}
+                            </div>
+                          </div>
                           
-                          {visit.followupdate && (
-                            <div className="mt-2 text-sm flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              <span>
-                                Follow-up scheduled for {format(new Date(visit.followupdate), 'MMMM d, yyyy')}
-                              </span>
+                          {order.laborderitems && order.laborderitems.length > 0 && (
+                            <div className="border rounded-md overflow-hidden mt-2">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>Test/Panel</TableHead>
+                                    <TableHead>Status</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {order.laborderitems.map((item: any, idx: number) => (
+                                    <TableRow key={item.orderitemid || idx}>
+                                      <TableCell>
+                                        {item.labtests?.testname || item.testpanels?.panelname || 'Unknown test'}
+                                      </TableCell>
+                                      <TableCell>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                          item.status === 'Completed' ? 'bg-green-100 text-green-800' :
+                                          item.status === 'InProcess' ? 'bg-amber-100 text-amber-800' :
+                                          'bg-blue-100 text-blue-800'
+                                        }`}>
+                                          {item.status}
+                                        </span>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
                             </div>
                           )}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-gray-500">No medical history available</div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="prescriptions" className="m-0">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-sm font-medium">Prescription History</h3>
-                    <Button asChild size="sm">
-                      <Link to={`/prescriptions/new?patientId=${patient.customerid}`}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        New Prescription
-                      </Link>
-                    </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                  
-                  {prescriptionsLoading ? (
-                    <div className="animate-pulse space-y-3">
-                      <div className="h-20 bg-gray-100 rounded w-full"></div>
-                      <div className="h-20 bg-gray-100 rounded w-full"></div>
-                    </div>
-                  ) : prescriptions && prescriptions.length > 0 ? (
-                    <div className="space-y-4">
-                      {prescriptions.map((prescription) => (
-                        <Card key={prescription.prescriptionid} className="bg-gray-50">
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start mb-3">
-                              <div>
-                                <div className="font-medium">
-                                  Prescription #{prescription.prescriptionid}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {format(new Date(prescription.prescriptiondate), 'MMMM d, yyyy')}
-                                </div>
-                              </div>
-                              
-                              <div className="text-sm text-gray-500">
-                                {prescription.doctors 
-                                  ? `Dr. ${prescription.doctors.firstname} ${prescription.doctors.lastname}`
-                                  : prescription.prescribingdoctor || 'Unknown doctor'}
-                              </div>
-                            </div>
-                            
-                            <Separator className="my-3" />
-                            
-                            <div className="space-y-2">
-                              {prescription.prescriptionitems?.map((item, index) => (
-                                <div key={item.prescriptionitemid} className="flex flex-col">
-                                  <div className="font-medium">
-                                    {item.products?.productname}
-                                    {item.products?.genericname && ` (${item.products.genericname})`}
-                                  </div>
-                                  <div className="text-sm text-gray-600">
-                                    {item.dosage && `${item.dosage}, `}
-                                    {item.frequency && `${item.frequency}, `}
-                                    {item.duration && `for ${item.duration}`}
-                                  </div>
-                                  {item.instructions && (
-                                    <div className="text-sm text-gray-500 italic mt-1">
-                                      {item.instructions}
-                                    </div>
-                                  )}
-                                  
-                                  {index < prescription.prescriptionitems.length - 1 && (
-                                    <Separator className="my-2" />
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-gray-500">No prescription history available</div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="lab-results" className="m-0">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-sm font-medium">Laboratory Results</h3>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    No lab records found
                   </div>
-                  
-                  {labResultsLoading ? (
-                    <div className="animate-pulse space-y-3">
-                      <div className="h-20 bg-gray-100 rounded w-full"></div>
-                      <div className="h-20 bg-gray-100 rounded w-full"></div>
-                    </div>
-                  ) : labResults && labResults.length > 0 ? (
-                    <div className="space-y-4">
-                      {labResults.map((order) => (
-                        <Card key={order.orderid} className="bg-gray-50">
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start mb-3">
-                              <div>
-                                <div className="font-medium">
-                                  Lab Order #{order.orderid}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {format(new Date(order.orderdate), 'MMMM d, yyyy')}
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <Separator className="my-3" />
-                            
-                            <div className="space-y-3">
-                              {order.laborderitems?.map((item) => {
-                                const testName = item.labtests?.testname || item.testpanels?.panelname;
-                                const hasResults = item.testresults && item.testresults.length > 0;
-                                
-                                return (
-                                  <div key={item.orderitemid} className="space-y-2">
-                                    <div className="font-medium">{testName || 'Unknown Test'}</div>
-                                    
-                                    {hasResults ? (
-                                      <div>
-                                        {item.testresults.map((result) => (
-                                          <div key={result.resultid} className="space-y-1">
-                                            <div className="flex items-center gap-2">
-                                              <span>Result:</span>
-                                              <span className={result.isabnormal ? 'text-red-600 font-medium' : ''}>
-                                                {result.result}
-                                                {result.isabnormal && ' (Abnormal)'}
-                                              </span>
-                                            </div>
-                                            
-                                            {result.resultnotes && (
-                                              <div className="text-sm text-gray-600">
-                                                Notes: {result.resultnotes}
-                                              </div>
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <div className="text-sm text-gray-500">
-                                        Status: {item.status || 'Pending'}
-                                      </div>
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-gray-500">No laboratory results available</div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </DialogContent>
     </Dialog>

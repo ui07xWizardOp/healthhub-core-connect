@@ -41,29 +41,47 @@ const PrescriptionManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPrescription, setSelectedPrescription] = useState<any | null>(null);
   
-  // Fetch doctor's prescriptions
+  // Fetch doctor's prescriptions using direct query instead of RPC
   const { data: prescriptions, isLoading, refetch } = useQuery({
     queryKey: ['doctor-prescriptions', userProfile?.doctorId],
     queryFn: async () => {
+      // Using direct query instead of RPC
       const { data, error } = await supabase
-        .rpc('get_doctor_prescriptions', { 
-          p_doctor_id: userProfile?.doctorId 
-        });
+        .from('prescriptions')
+        .select(`
+          prescriptionid,
+          customerid,
+          prescriptiondate,
+          expirydate,
+          users!inner (firstname, lastname),
+          prescriptionitems (prescriptionitemid)
+        `)
+        .eq('doctorid', userProfile?.doctorId);
       
       if (error) throw error;
-      return data || [];
+      
+      // Transform the data to match our expected format
+      return data.map((prescription) => ({
+        prescriptionid: prescription.prescriptionid,
+        customerid: prescription.customerid,
+        customerFirstName: prescription.users.firstname,
+        customerLastName: prescription.users.lastname,
+        prescriptiondate: prescription.prescriptiondate,
+        expirydate: prescription.expirydate,
+        itemcount: prescription.prescriptionitems?.length || 0
+      })) || [];
     },
     enabled: !!userProfile?.doctorId
   });
 
   // Filter prescriptions based on search query
-  const filteredPrescriptions = prescriptions?.filter(
+  const filteredPrescriptions = prescriptions ? prescriptions.filter(
     (prescription: Prescription) => {
       const fullName = `${prescription.customerFirstName} ${prescription.customerLastName}`.toLowerCase();
       return fullName.includes(searchQuery.toLowerCase()) || 
              prescription.prescriptionid.toString().includes(searchQuery);
     }
-  );
+  ) : [];
 
   const handleViewPrescription = (prescription: any) => {
     setSelectedPrescription(prescription);

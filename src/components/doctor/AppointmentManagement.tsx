@@ -62,7 +62,7 @@ const AppointmentManagement: React.FC = () => {
           duration,
           status,
           notes,
-          users:customerid (
+          users!inner (
             firstname,
             lastname
           )
@@ -78,6 +78,7 @@ const AppointmentManagement: React.FC = () => {
       
       if (error) throw error;
       
+      // Transform data to include user details directly in appointment object
       return data?.map(appt => ({
         appointmentid: appt.appointmentid,
         customerid: appt.customerid,

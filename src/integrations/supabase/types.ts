@@ -1826,6 +1826,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_doctor_prescriptions: {
+        Args: { p_doctor_id: number }
+        Returns: {
+          prescriptionid: number
+          customerid: number
+          customerfirstname: string
+          customerlastname: string
+          prescriptiondate: string
+          expirydate: string
+          itemcount: number
+        }[]
+      }
       get_patient_medications: {
         Args: { p_customer_id: number }
         Returns: {
