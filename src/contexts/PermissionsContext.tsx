@@ -10,6 +10,7 @@ type PermissionsContextType = {
   canViewInventory: boolean;
   canViewEmployees: boolean;
   canViewSettings: boolean;
+  canViewDoctorPortal: boolean;
   canEditMedication: boolean;
   canEditLabTest: boolean;
   canEditCustomer: boolean;
@@ -30,6 +31,7 @@ export const PermissionsProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const canViewInventory = isAdmin() || isStaff();
   const canViewEmployees = isAdmin();
   const canViewSettings = isAdmin() || isStaff();
+  const canViewDoctorPortal = isAdmin() || isDoctor();
   
   // Specific action permissions
   const canEditMedication = isAdmin() || isStaff();
@@ -61,6 +63,10 @@ export const PermissionsProvider: React.FC<{ children: React.ReactNode }> = ({ c
       routes.push({ path: '/inventory', name: 'Inventory', icon: 'ShoppingCart' });
     }
     
+    if (canViewDoctorPortal) {
+      routes.push({ path: '/doctor-portal', name: 'Doctor Portal', icon: 'ClipboardList' });
+    }
+    
     if (canViewEmployees) {
       routes.push({ path: '/employees', name: 'Employees', icon: 'User' });
     }
@@ -80,6 +86,7 @@ export const PermissionsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     canViewInventory,
     canViewEmployees,
     canViewSettings,
+    canViewDoctorPortal,
     canEditMedication,
     canEditLabTest,
     canEditCustomer,

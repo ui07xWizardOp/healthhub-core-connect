@@ -22,6 +22,7 @@ import Inventory from "./pages/Inventory";
 import Employees from "./pages/Employees";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import DoctorPortal from "./pages/DoctorPortal";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -96,6 +97,15 @@ const App = () => (
                 <ProtectedRoute>
                   <ProfileCompletionGuard>
                     <Settings />
+                  </ProfileCompletionGuard>
+                </ProtectedRoute>
+              } />
+              
+              {/* Doctor Portal */}
+              <Route path="/doctor-portal" element={
+                <ProtectedRoute requiredPermissions={['isDoctor']}>
+                  <ProfileCompletionGuard>
+                    <DoctorPortal />
                   </ProfileCompletionGuard>
                 </ProtectedRoute>
               } />
