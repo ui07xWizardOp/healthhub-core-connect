@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import PrescriptionForm from '@/components/pharmacy/PrescriptionForm';
 
+// Fix the interface to match the data structure returned from Supabase
 interface Prescription {
   prescriptionid: number;
   customerid: number;
@@ -33,7 +34,7 @@ interface Prescription {
   customerLastName: string;
   prescriptiondate: string;
   expirydate: string | null;
-  itemCount: number;
+  itemcount: number; // Changed from itemCount to itemcount to match database field
 }
 
 const PrescriptionManagement: React.FC = () => {
@@ -141,7 +142,7 @@ const PrescriptionManagement: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredPrescriptions.map((prescription: any) => (
+                  {filteredPrescriptions.map((prescription: Prescription) => (
                     <TableRow key={prescription.prescriptionid}>
                       <TableCell className="font-medium">{prescription.prescriptionid}</TableCell>
                       <TableCell>
