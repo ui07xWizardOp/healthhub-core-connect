@@ -7,6 +7,7 @@ import StaffDashboard from '@/components/dashboard/StaffDashboard';
 import LabTechnicianDashboard from '@/components/dashboard/LabTechnicianDashboard';
 import CustomerDashboard from '@/components/dashboard/CustomerDashboard';
 import DashboardSelector from '@/components/dashboard/DashboardSelector';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Dashboard: React.FC = () => {
   const { userProfile, isAdmin, isStaff, isDoctor, isCustomer, hasRole } = useAuth();
@@ -39,8 +40,24 @@ const Dashboard: React.FC = () => {
   if (!userProfile) {
     return (
       <DashboardLayout>
-        <div className="p-6 flex items-center justify-center h-[calc(100vh-80px)]">
-          <p className="text-lg text-gray-500">Loading user profile...</p>
+        <div className="p-6 space-y-6">
+          <div className="flex items-center space-x-4">
+            <Skeleton className="h-12 w-[250px]" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-[200px]" />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Skeleton className="h-[300px] rounded-lg" />
+            <Skeleton className="h-[300px] rounded-lg" />
+            <Skeleton className="h-[300px] rounded-lg" />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Skeleton className="h-[250px] rounded-lg" />
+            <Skeleton className="h-[250px] rounded-lg" />
+          </div>
         </div>
       </DashboardLayout>
     );
