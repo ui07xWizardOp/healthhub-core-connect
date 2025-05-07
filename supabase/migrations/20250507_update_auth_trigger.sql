@@ -1,5 +1,5 @@
 
--- This trigger function will insert a row into public.users whenever a new auth user is created
+-- Update auth trigger function to assign roles
 CREATE OR REPLACE FUNCTION public.handle_new_auth_user()
 RETURNS TRIGGER AS $$
 DECLARE

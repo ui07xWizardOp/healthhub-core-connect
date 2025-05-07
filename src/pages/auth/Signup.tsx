@@ -8,7 +8,21 @@ import { toast } from 'sonner';
 import { Eye, EyeOff, Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { 
+  Form, 
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
+} from '@/components/ui/form';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
 import Logo from '@/components/Logo';
 
@@ -17,6 +31,7 @@ const signupSchema = z.object({
   lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email('Please enter a valid email'),
   phone: z.string().optional(),
+  role: z.string().default('Customer'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string().min(6, 'Please confirm your password')
 }).refine((data) => data.password === data.confirmPassword, {
@@ -40,6 +55,7 @@ const Signup: React.FC = () => {
       lastName: '',
       email: '',
       phone: '',
+      role: 'Customer',
       password: '',
       confirmPassword: ''
     }
@@ -51,7 +67,8 @@ const Signup: React.FC = () => {
       const userData = {
         first_name: values.firstName,
         last_name: values.lastName,
-        phone: values.phone || null
+        phone: values.phone || null,
+        role: values.role
       };
 
       const { data, error } = await signUp(values.email, values.password, userData);
@@ -60,7 +77,7 @@ const Signup: React.FC = () => {
         toast.error(error.message || 'Failed to sign up');
       } else {
         toast.success('Successfully signed up! Please check your email for verification.');
-        // Redirect to profile completion page instead of login
+        // Redirect to profile completion page
         navigate('/complete-profile');
       }
     } catch (error: any) {
@@ -152,6 +169,34 @@ const Signup: React.FC = () => {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Role (for demo purposes)</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={isLoading}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a role" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Customer">Customer</SelectItem>
+                      <SelectItem value="Staff">Staff</SelectItem>
+                      <SelectItem value="Admin">Admin</SelectItem>
+                      <SelectItem value="LabTechnician">Lab Technician</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

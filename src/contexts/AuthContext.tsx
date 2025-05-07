@@ -83,6 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Fixed: Check if data is an object with a success property
         if (typeof data === 'object' && data !== null && 'success' in data) {
           if (data.success) {
+            console.log('User profile data loaded successfully:', data);
             // Type assertion to help TypeScript understand the structure
             const profileData = data as Record<string, any>;
             // Remove success flag and use the rest of the data
@@ -102,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
+      async (event, newSession) => {
         console.log('Auth state changed:', event);
         setSession(newSession);
         setUser(newSession?.user ?? null);
