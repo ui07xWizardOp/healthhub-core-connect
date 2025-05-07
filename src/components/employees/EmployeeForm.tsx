@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -95,31 +94,17 @@ const EmployeeForm = ({ employee, onClose }: EmployeeFormProps) => {
           
         if (updateError) throw updateError;
       } else {
-        // Fix: Instead of using RPC, we'll directly insert the user data
-        // This avoids the TypeScript error with the RPC function
-        const { error: insertError } = await supabase
+        // Insert user with default values - don't provide userid as it's auto-generated
+        const { data: insertedUser, error: insertError } = await supabase
           .from('users')
           .insert({
-            firstname: values.firstname,
-            lastname: values.lastname,
-            email: values.email,
-            phone: values.phone || null,
-            address: values.address || null,
-            username: values.username,
-            passwordhash: values.password,
-            isactive: values.isactive
-          });
-        
-        if (insertError) throw insertError;
-        
-        // Get the created user
-        const { data: newUser, error: fetchError } = await supabase
-          .from('users')
+            ...dataToSubmit,
+            datecreated: new Date().toISOString()
+          })
           .select('userid')
-          .eq('username', values.username)
           .single();
-        
-        if (fetchError) throw fetchError;
+          
+        if (insertError) throw insertError;
         
         // Get role ID
         const { data: roleData, error: roleError } = await supabase
@@ -127,14 +112,14 @@ const EmployeeForm = ({ employee, onClose }: EmployeeFormProps) => {
           .select('roleid')
           .eq('rolename', values.role)
           .single();
-        
+          
         if (roleError) throw roleError;
         
         // Add role mapping
         const { error: mappingError } = await supabase
           .from('userrolemapping')
           .insert({
-            userid: newUser.userid,
+            userid: insertedUser.userid,
             roleid: roleData.roleid
           });
         
@@ -145,7 +130,7 @@ const EmployeeForm = ({ employee, onClose }: EmployeeFormProps) => {
           const { error: profileError } = await supabase
             .from('customerprofiles')
             .insert({
-              customerid: newUser.userid
+              customerid: insertedUser.userid
             });
           
           if (profileError) throw profileError;

@@ -26,6 +26,16 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 
+interface MedicationData {
+  medication: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  instructions: string;
+  remaining: number;
+  refilltrigger: number;
+}
+
 const CustomerDashboard: React.FC = () => {
   const { userProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
@@ -33,7 +43,7 @@ const CustomerDashboard: React.FC = () => {
     appointments: [],
     prescriptions: [],
     labReports: [],
-    medications: [],
+    medications: [] as MedicationData[],
     healthMetrics: [],
     notifications: []
   });
@@ -111,7 +121,7 @@ const CustomerDashboard: React.FC = () => {
         
         if (labOrdersError) throw labOrdersError;
 
-        // Fetch prescription items (medications)
+        // Fetch prescription items (medications) using custom function
         const { data: medications, error: medicationsError } = await supabase
           .rpc('get_patient_medications', {
             p_customer_id: userProfile.customerId
@@ -133,7 +143,7 @@ const CustomerDashboard: React.FC = () => {
           appointments: appointments || [],
           prescriptions: prescriptions || [],
           labReports: labOrders || [],
-          medications: medications || [],
+          medications: medications as MedicationData[] || [],
           healthMetrics: healthMetricsData, // Using mock data for now
           notifications: notifications || []
         });
@@ -153,7 +163,7 @@ const CustomerDashboard: React.FC = () => {
   }, [userProfile, toast]);
 
   // Determine if a medication needs refill (example logic)
-  const needsRefill = (medication: any) => {
+  const needsRefill = (medication: MedicationData) => {
     return medication.remaining && medication.remaining <= medication.refilltrigger;
   };
 
@@ -262,7 +272,7 @@ const CustomerDashboard: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {data.medications.slice(0, 3).map((med: any, index: number) => (
+                    {data.medications.slice(0, 3).map((med: MedicationData, index: number) => (
                       <div key={index} className="p-3 border rounded-md hover:bg-gray-50">
                         <div className="flex justify-between">
                           <p className="font-medium">{med.medication}</p>
@@ -368,7 +378,6 @@ const CustomerDashboard: React.FC = () => {
                     config={{
                       glucose: {
                         label: 'Glucose',
-                        color: 'hsl(var(--chart-1))',
                         theme: {
                           light: 'hsl(var(--chart-1))',
                           dark: 'hsl(var(--chart-1))',
@@ -376,7 +385,6 @@ const CustomerDashboard: React.FC = () => {
                       },
                       weight: {
                         label: 'Weight',
-                        color: 'hsl(var(--chart-2))',
                         theme: {
                           light: 'hsl(var(--chart-2))',
                           dark: 'hsl(var(--chart-2))',
@@ -505,14 +513,14 @@ const CustomerDashboard: React.FC = () => {
                     ))}
                     
                     {/* Example medication refill notifications */}
-                    {data.medications && data.medications.some((med: any) => needsRefill(med)) && (
+                    {data.medications && data.medications.some((med: MedicationData) => needsRefill(med)) && (
                       <div className="p-3 border rounded-md hover:bg-gray-50 bg-red-50">
                         <div className="flex items-start gap-3">
                           <PillIcon className="h-5 w-5 text-red-500 mt-0.5" />
                           <div className="flex-1">
                             <p className="font-medium">Medication Refill Needed</p>
                             <p className="text-sm text-gray-600">
-                              {data.medications.filter((med: any) => needsRefill(med)).map((med: any) => med.medication).join(', ')} need refilling.
+                              {data.medications.filter((med: MedicationData) => needsRefill(med)).map((med: MedicationData) => med.medication).join(', ')} need refilling.
                             </p>
                             <p className="text-xs text-gray-500 mt-1">Today</p>
                           </div>
@@ -763,7 +771,7 @@ const CustomerDashboard: React.FC = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {data.medications.map((med: any, idx: number) => (
+                        {data.medications.map((med: MedicationData, idx: number) => (
                           <TableRow key={idx}>
                             <TableCell className="font-medium">{med.medication}</TableCell>
                             <TableCell>{med.dosage || 'As directed'}</TableCell>

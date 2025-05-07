@@ -1826,6 +1826,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_patient_medications: {
+        Args: { p_customer_id: number }
+        Returns: {
+          medication: string
+          dosage: string
+          frequency: string
+          duration: string
+          instructions: string
+          remaining: number
+          refilltrigger: number
+        }[]
+      }
       get_user_profile: {
         Args: { user_id: string }
         Returns: Json
