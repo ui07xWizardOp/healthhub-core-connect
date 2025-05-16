@@ -12,7 +12,7 @@ import ProfileSettings from '@/components/settings/ProfileSettings';
 import SecuritySettings from '@/components/settings/SecuritySettings';
 
 const Settings: React.FC = () => {
-  const { userProfile } = useAuth();
+  const { userProfile, hasRole, isAdmin, isStaff, isDoctor, isCustomer } = useAuth();
 
   return (
     <DashboardLayout>
@@ -78,27 +78,27 @@ const Settings: React.FC = () => {
                   <span className="text-sm font-medium text-gray-500">Special Statuses:</span>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-1">
                     <div>
-                      <Badge variant={userProfile?.isAdmin ? "default" : "outline"} 
-                        className={userProfile?.isAdmin ? "bg-blue-600" : ""}>
-                        Admin: {userProfile?.isAdmin ? 'Yes' : 'No'}
+                      <Badge variant={isAdmin() ? "default" : "outline"} 
+                        className={isAdmin() ? "bg-blue-600" : ""}>
+                        Admin: {isAdmin() ? 'Yes' : 'No'}
                       </Badge>
                     </div>
                     <div>
-                      <Badge variant={userProfile?.isStaff ? "default" : "outline"}
-                        className={userProfile?.isStaff ? "bg-blue-600" : ""}>
-                        Staff: {userProfile?.isStaff ? 'Yes' : 'No'}
+                      <Badge variant={isStaff() ? "default" : "outline"}
+                        className={isStaff() ? "bg-blue-600" : ""}>
+                        Staff: {isStaff() ? 'Yes' : 'No'}
                       </Badge>
                     </div>
                     <div>
-                      <Badge variant={userProfile?.isDoctor ? "default" : "outline"}
-                        className={userProfile?.isDoctor ? "bg-blue-600" : ""}>
-                        Doctor: {userProfile?.isDoctor ? 'Yes' : 'No'}
+                      <Badge variant={isDoctor() ? "default" : "outline"}
+                        className={isDoctor() ? "bg-blue-600" : ""}>
+                        Doctor: {isDoctor() ? 'Yes' : 'No'}
                       </Badge>
                     </div>
                     <div>
-                      <Badge variant={userProfile?.isCustomer ? "default" : "outline"}
-                        className={userProfile?.isCustomer ? "bg-blue-600" : ""}>
-                        Customer: {userProfile?.isCustomer ? 'Yes' : 'No'}
+                      <Badge variant={isCustomer() ? "default" : "outline"}
+                        className={isCustomer() ? "bg-blue-600" : ""}>
+                        Customer: {isCustomer() ? 'Yes' : 'No'}
                       </Badge>
                     </div>
                   </div>
