@@ -2,12 +2,15 @@
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Database } from "@/integrations/supabase/types";
+
+type TableName = keyof Database['public']['Tables'];
 
 /**
  * A custom hook to handle Supabase queries with proper TypeScript support
  */
 export function useSupabaseQuery<T = any>(
-  tableName: string,
+  tableName: TableName,
   options: {
     select?: string;
     filters?: (query: any) => any;
@@ -75,7 +78,7 @@ export function useSupabaseQuery<T = any>(
  * A custom hook to fetch a single row from a Supabase table by ID
  */
 export function useSupabaseRecord<T = any>(
-  tableName: string,
+  tableName: TableName,
   id: string | number | null | undefined,
   options: {
     idField?: string;
