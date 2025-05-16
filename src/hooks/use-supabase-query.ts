@@ -103,19 +103,18 @@ export function useSupabaseRecord<T = any>(
       setError(null);
 
       try {
-        // Break down the query into separate steps to avoid type recursion issues
-        const query = supabase
+        // Use a more direct approach to avoid type recursion
+        const { data, error: queryError } = await supabase
           .from(tableName)
-          .select(select);
+          .select(select)
+          .eq(idField, id)
+          .maybeSingle();
         
-        // Apply the filter in a separate step
-        const response = await query.eq(idField, id).maybeSingle();
-        
-        if (response.error) {
-          throw response.error;
+        if (queryError) {
+          throw queryError;
         }
 
-        setRecord(response.data as T);
+        setRecord(data as T);
       } catch (err: any) {
         setError(err);
         console.error(`Error fetching record from ${tableName}:`, err.message);
