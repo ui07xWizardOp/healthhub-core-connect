@@ -103,12 +103,13 @@ export function useSupabaseRecord<T = any>(
       setError(null);
 
       try {
-        // Using type assertion to avoid excessive type depth
-        const response = await supabase
+        // Using explicit typing and avoiding chained method calls to reduce type complexity
+        const query = supabase
           .from(tableName)
           .select(select)
-          .eq(idField, id)
-          .maybeSingle();
+          .eq(idField, id);
+          
+        const response = await query.maybeSingle();
 
         if (response.error) {
           throw response.error;
