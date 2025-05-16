@@ -9,6 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      appointment_notifications: {
+        Row: {
+          appointment_id: number | null
+          created_at: string | null
+          is_read: boolean | null
+          message: string
+          notification_id: string
+          notification_type: string
+          scheduled_for: string | null
+          sent_at: string | null
+          title: string
+          user_id: number | null
+        }
+        Insert: {
+          appointment_id?: number | null
+          created_at?: string | null
+          is_read?: boolean | null
+          message: string
+          notification_id?: string
+          notification_type: string
+          scheduled_for?: string | null
+          sent_at?: string | null
+          title: string
+          user_id?: number | null
+        }
+        Update: {
+          appointment_id?: number | null
+          created_at?: string | null
+          is_read?: boolean | null
+          message?: string
+          notification_id?: string
+          notification_type?: string
+          scheduled_for?: string | null
+          sent_at?: string | null
+          title?: string
+          user_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_notifications_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["appointmentid"]
+          },
+          {
+            foreignKeyName: "appointment_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["userid"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           appointmentdate: string

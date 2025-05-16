@@ -1,4 +1,3 @@
-
 /**
  * This file contains supplementary type definitions for Supabase tables
  * to improve developer experience when working with the Supabase client.
@@ -180,4 +179,17 @@ export interface LabTest {
   childnormalrange?: string | null;
   units?: string | null;
   isactive?: boolean | null;
+}
+
+export interface AppointmentNotification {
+  notification_id: string;
+  appointment_id: number;
+  user_id: number;
+  title: string;
+  message: string;
+  notification_type: 'reminder' | 'cancellation' | 'reschedule' | 'confirmation';
+  scheduled_for?: string | null;
+  sent_at?: string | null;
+  is_read: boolean;
+  created_at: string;
 }

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -27,6 +26,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePermissions } from '@/contexts/PermissionsContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
+import NotificationsPanel from '@/components/appointments/NotificationsPanel';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -97,7 +97,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter className="border-t border-border p-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <NotificationsPanel />
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#D6EFFF]">
                 <User className="h-4 w-4 text-healthhub-orange" />
               </div>
