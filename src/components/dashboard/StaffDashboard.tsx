@@ -33,8 +33,8 @@ const StaffDashboard: React.FC = () => {
         // Fetch low stock items count
         const { data: lowStock, error: lowStockError } = await supabase
           .from('products')
-          .select('productid, productname, quantityinstock', { count: 'exact' })
-          .lt('quantityinstock', 10)
+          .select('productid, productname, quantityinstock')
+          .lt('reorderthreshold', 10)
           .limit(5);
         
         if (lowStockError) throw lowStockError;
@@ -46,7 +46,7 @@ const StaffDashboard: React.FC = () => {
             saleid, 
             saledate, 
             netamount,
-            customerid (customerid),
+            customerid,
             status
           `)
           .order('saledate', { ascending: false })

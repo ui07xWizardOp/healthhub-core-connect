@@ -40,43 +40,49 @@ const LabTechnicianDashboard: React.FC = () => {
     async function fetchDashboardData() {
       setLoading(true);
       try {
-        // Fetch pending lab orders count
-        const { count: pendingOrdersCount, error: pendingOrdersError } = await supabase
-          .from('laborders')
-          .select('*', { count: 'exact', head: true })
-          .in('status', ['Ordered', 'SampleCollected', 'InProcess']);
-        
-        if (pendingOrdersError) throw pendingOrdersError;
+        // Use Promise.all to fetch all data in parallel
+        const [
+          pendingOrdersResult,
+          pendingSamplesResult,
+          completedResult,
+          abnormalResult
+        ] = await Promise.all([
+          // Fetch pending lab orders count
+          supabase
+            .from('laborders')
+            .select('*', { count: 'exact', head: true })
+            .in('status', ['Ordered', 'SampleCollected', 'InProcess']),
+          
+          // Fetch pending samples count
+          supabase
+            .from('laborders')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'Ordered'),
+          
+          // Fetch completed tests count
+          supabase
+            .from('laborderitems')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'Completed'),
+          
+          // Fetch abnormal results count
+          supabase
+            .from('testresults')
+            .select('*', { count: 'exact', head: true })
+            .eq('isabnormal', true)
+        ]);
 
-        // Fetch pending samples count
-        const { count: pendingSamplesCount, error: pendingSamplesError } = await supabase
-          .from('laborders')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'Ordered');
-        
-        if (pendingSamplesError) throw pendingSamplesError;
-
-        // Fetch completed tests count
-        const { count: completedCount, error: completedError } = await supabase
-          .from('laborderitems')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'Completed');
-        
-        if (completedError) throw completedError;
-
-        // Fetch abnormal results count
-        const { count: abnormalCount, error: abnormalError } = await supabase
-          .from('testresults')
-          .select('*', { count: 'exact', head: true })
-          .eq('isabnormal', true);
-        
-        if (abnormalError) throw abnormalError;
+        // Check for errors
+        if (pendingOrdersResult.error) throw pendingOrdersResult.error;
+        if (pendingSamplesResult.error) throw pendingSamplesResult.error;
+        if (completedResult.error) throw completedResult.error;
+        if (abnormalResult.error) throw abnormalResult.error;
 
         setStats({
-          pendingOrders: pendingOrdersCount || 0,
-          pendingSamples: pendingSamplesCount || 0,
-          completedTests: completedCount || 0,
-          abnormalResults: abnormalCount || 0,
+          pendingOrders: pendingOrdersResult.count || 0,
+          pendingSamples: pendingSamplesResult.count || 0,
+          completedTests: completedResult.count || 0,
+          abnormalResults: abnormalResult.count || 0,
         });
       } catch (error: any) {
         console.error('Error fetching lab technician dashboard data:', error.message);

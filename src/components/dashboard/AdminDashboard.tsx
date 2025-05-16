@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -58,56 +57,49 @@ const AdminDashboard: React.FC = () => {
     async function fetchDashboardData() {
       setLoading(true);
       try {
-        // Fetch total products count
-        const { count: medicineCount, error: medicineError } = await supabase
-          .from('products')
-          .select('*', { count: 'exact', head: true });
-        
-        if (medicineError) throw medicineError;
+        // Use Promise.all to fetch all data in parallel
+        const [
+          medicineResult,
+          testResult,
+          customerResult,
+          orderResult,
+          appointmentResult,
+          salesResult
+        ] = await Promise.all([
+          // Fetch total products count
+          supabase.from('products').select('*', { count: 'exact', head: true }),
+          // Fetch total tests count
+          supabase.from('labtests').select('*', { count: 'exact', head: true }),
+          // Fetch total customers count
+          supabase.from('customerprofiles').select('*', { count: 'exact', head: true }),
+          // Fetch total orders count
+          supabase.from('sales').select('*', { count: 'exact', head: true }),
+          // Fetch total appointments count
+          supabase.from('appointments').select('*', { count: 'exact', head: true }),
+          // Calculate total revenue
+          supabase.from('sales').select('netamount')
+        ]);
 
-        // Fetch total tests count
-        const { count: testCount, error: testError } = await supabase
-          .from('labtests')
-          .select('*', { count: 'exact', head: true });
-        
-        if (testError) throw testError;
+        // Check for errors
+        if (medicineResult.error) throw medicineResult.error;
+        if (testResult.error) throw testResult.error;
+        if (customerResult.error) throw customerResult.error;
+        if (orderResult.error) throw orderResult.error;
+        if (appointmentResult.error) throw appointmentResult.error;
+        if (salesResult.error) throw salesResult.error;
 
-        // Fetch total customers count
-        const { count: customerCount, error: customerError } = await supabase
-          .from('customerprofiles')
-          .select('*', { count: 'exact', head: true });
-        
-        if (customerError) throw customerError;
-
-        // Fetch total orders count
-        const { count: orderCount, error: orderError } = await supabase
-          .from('sales')
-          .select('*', { count: 'exact', head: true });
-        
-        if (orderError) throw orderError;
-
-        // Fetch total appointments count
-        const { count: appointmentCount, error: appointmentError } = await supabase
-          .from('appointments')
-          .select('*', { count: 'exact', head: true });
-        
-        if (appointmentError) throw appointmentError;
-
-        // Calculate total revenue (simplified for MVP)
-        const { data: salesData, error: salesError } = await supabase
-          .from('sales')
-          .select('netamount');
-        
-        if (salesError) throw salesError;
-        
-        const totalRevenue = salesData?.reduce((sum, sale) => sum + (Number(sale.netamount) || 0), 0) || 0;
+        // Calculate total revenue
+        const totalRevenue = salesResult.data?.reduce(
+          (sum, sale) => sum + (Number(sale.netamount) || 0), 
+          0
+        ) || 0;
 
         setStats({
-          totalMedicines: medicineCount || 0,
-          totalTests: testCount || 0,
-          totalCustomers: customerCount || 0,
-          totalOrders: orderCount || 0,
-          totalAppointments: appointmentCount || 0,
+          totalMedicines: medicineResult.count || 0,
+          totalTests: testResult.count || 0,
+          totalCustomers: customerResult.count || 0,
+          totalOrders: orderResult.count || 0,
+          totalAppointments: appointmentResult.count || 0,
           totalRevenue: totalRevenue
         });
       } catch (error: any) {
