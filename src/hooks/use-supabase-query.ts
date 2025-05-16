@@ -103,17 +103,18 @@ export function useSupabaseRecord<T = any>(
       setError(null);
 
       try {
-        const { data: result, error: queryError } = await supabase
+        // Using type assertion to avoid excessive type depth
+        const response = await supabase
           .from(tableName)
           .select(select)
           .eq(idField, id)
           .maybeSingle();
 
-        if (queryError) {
-          throw queryError;
+        if (response.error) {
+          throw response.error;
         }
 
-        setRecord(result as T);
+        setRecord(response.data as T);
       } catch (err: any) {
         setError(err);
         console.error(`Error fetching record from ${tableName}:`, err.message);
