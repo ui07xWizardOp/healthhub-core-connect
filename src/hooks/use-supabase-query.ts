@@ -103,19 +103,18 @@ export function useSupabaseRecord<T = any>(
       setError(null);
 
       try {
-        // Using explicit typing and avoiding chained method calls to reduce type complexity
-        const query = supabase
-          .from(tableName)
+        // Simplify the query structure and use type assertions to avoid deep type instantiation
+        const { data, error: queryError } = await supabase
+          .from(tableName as string)
           .select(select)
-          .eq(idField, id);
-          
-        const response = await query.maybeSingle();
+          .eq(idField, id as any)
+          .maybeSingle();
 
-        if (response.error) {
-          throw response.error;
+        if (queryError) {
+          throw queryError;
         }
 
-        setRecord(response.data as T);
+        setRecord(data as T);
       } catch (err: any) {
         setError(err);
         console.error(`Error fetching record from ${tableName}:`, err.message);
