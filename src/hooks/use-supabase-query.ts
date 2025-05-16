@@ -103,12 +103,11 @@ export function useSupabaseRecord<T = any>(
       setError(null);
 
       try {
-        // Use a more direct approach to avoid type recursion
-        const { data, error: queryError } = await supabase
-          .from(tableName)
-          .select(select)
-          .eq(idField, id)
-          .maybeSingle();
+        // Use type assertions and avoid chaining to prevent deep type instantiation
+        const queryBuilder = supabase.from(tableName);
+        const selectQuery = queryBuilder.select(select);
+        const filteredQuery = selectQuery.eq(idField, id);
+        const { data, error: queryError } = await filteredQuery.maybeSingle();
         
         if (queryError) {
           throw queryError;
