@@ -34,16 +34,16 @@ const NotificationsPanel = () => {
     {
       filters: (query) => {
         return query
-          .eq('user_id', userProfile?.userId || 0)
+          .eq('user_id', userProfile?.userid || 0)
           .order('created_at', { ascending: false });
       },
-      enabled: !!userProfile?.userId,
+      enabled: !!userProfile?.userid,
     }
   );
 
   // Setup realtime subscription for notifications
   useEffect(() => {
-    if (!userProfile?.userId) return;
+    if (!userProfile?.userid) return;
 
     const notificationsChannel = supabase
       .channel('notification-changes')
@@ -52,7 +52,7 @@ const NotificationsPanel = () => {
           event: '*', 
           schema: 'public', 
           table: 'appointment_notifications',
-          filter: `user_id=eq.${userProfile.userId}`
+          filter: `user_id=eq.${userProfile.userid}`
         }, 
         () => {
           // Refresh notifications when there's a change
@@ -91,13 +91,13 @@ const NotificationsPanel = () => {
   };
 
   const markAllAsRead = async () => {
-    if (!userProfile?.userId || !notifications?.length) return;
+    if (!userProfile?.userid || !notifications?.length) return;
     
     try {
       const { error } = await supabase
         .from('appointment_notifications')
         .update({ is_read: true })
-        .eq('user_id', userProfile.userId)
+        .eq('user_id', userProfile.userid)
         .eq('is_read', false);
 
       if (error) throw error;

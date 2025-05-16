@@ -1,3 +1,4 @@
+
 /**
  * This file contains supplementary type definitions for Supabase tables
  * to improve developer experience when working with the Supabase client.
@@ -193,3 +194,14 @@ export interface AppointmentNotification {
   is_read: boolean;
   created_at: string;
 }
+
+export interface DoctorSchedule {
+  scheduleid: number;
+  doctorid: number;
+  dayofweek: number;
+  starttime: string;
+  endtime: string;
+  maxappointments?: number;
+  isactive: boolean;
+}
+

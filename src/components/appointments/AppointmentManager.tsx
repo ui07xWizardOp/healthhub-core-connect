@@ -39,8 +39,8 @@ const AppointmentManager: React.FC<AppointmentManagerProps> = ({ mode, refreshTr
     {
       filters: (query) => {
         let filteredQuery = query;
-        if (mode === 'patient' && userProfile?.userId) {
-          filteredQuery = filteredQuery.eq('customerid', userProfile.userId);
+        if (mode === 'patient' && userProfile?.userid) {
+          filteredQuery = filteredQuery.eq('customerid', userProfile.userid);
         } else if (mode === 'doctor' && userProfile?.doctorId) {
           filteredQuery = filteredQuery.eq('doctorid', userProfile.doctorId);
         }
@@ -70,8 +70,8 @@ const AppointmentManager: React.FC<AppointmentManagerProps> = ({ mode, refreshTr
           event: '*', 
           schema: 'public', 
           table: 'appointments',
-          filter: mode === 'patient' && userProfile?.userId ? 
-            `customerid=eq.${userProfile.userId}` : 
+          filter: mode === 'patient' && userProfile?.userid ? 
+            `customerid=eq.${userProfile.userid}` : 
             (mode === 'doctor' && userProfile?.doctorId ? 
               `doctorid=eq.${userProfile.doctorId}` : undefined)
         }, 

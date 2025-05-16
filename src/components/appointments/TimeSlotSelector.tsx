@@ -114,7 +114,7 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
 
   // Function to book an appointment
   const bookAppointment = async (time: string) => {
-    if (!userProfile?.userId) {
+    if (!userProfile?.userid) {
       toast({
         title: 'Authentication required',
         description: 'Please log in to book an appointment',
@@ -126,21 +126,22 @@ const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
     setBookingSlot(time);
 
     try {
-      const appointment: Partial<Appointment> = {
-        customerid: userProfile.userId,
+      // Prepare the appointment data
+      const appointmentData = {
+        customerid: userProfile.userid,
         doctorid: doctorId,
         appointmentdate: format(selectedDate, 'yyyy-MM-dd'),
         appointmenttime: time,
         duration: 30,
         status: 'Scheduled',
         bookingdatetime: new Date().toISOString(),
-        bookedby: userProfile.userId,
+        bookedby: userProfile.userid,
         paymentstatus: 'Pending'
       };
 
       const { data, error } = await supabase
         .from('appointments')
-        .insert(appointment)
+        .insert(appointmentData)
         .select('*')
         .single();
 

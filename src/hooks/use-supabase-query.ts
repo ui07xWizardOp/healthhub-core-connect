@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
@@ -25,53 +25,54 @@ export function useSupabaseQuery<T = any>(
 
   const { select = '*', filters, enabled = true } = options;
 
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Start building the query
+      let query = supabase.from(tableName).select(select);
+
+      // Apply any filters if provided
+      if (filters) {
+        query = filters(query);
+      }
+
+      // Execute the query
+      const { data: result, error: queryError, count: queryCount } = await query;
+
+      if (queryError) {
+        throw queryError;
+      }
+
+      setData(result as T[]);
+      if (queryCount !== null) {
+        setCount(queryCount);
+      }
+    } catch (err: any) {
+      setError(err);
+      console.error(`Error fetching data from ${tableName}:`, err.message);
+      toast({
+        title: `Error fetching data from ${tableName}`,
+        description: err.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [tableName, select, toast, enabled, filters]);
+
   useEffect(() => {
     if (!enabled) {
       setIsLoading(false);
       return;
     }
 
-    async function fetchData() {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        // Start building the query
-        let query = supabase.from(tableName).select(select);
-
-        // Apply any filters if provided
-        if (filters) {
-          query = filters(query);
-        }
-
-        // Execute the query
-        const { data: result, error: queryError, count: queryCount } = await query;
-
-        if (queryError) {
-          throw queryError;
-        }
-
-        setData(result as T[]);
-        if (queryCount !== null) {
-          setCount(queryCount);
-        }
-      } catch (err: any) {
-        setError(err);
-        console.error(`Error fetching data from ${tableName}:`, err.message);
-        toast({
-          title: `Error fetching data from ${tableName}`,
-          description: err.message,
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     fetchData();
-  }, [tableName, select, toast, enabled]);
+  }, [fetchData, enabled]);
 
-  return { data, count, isLoading, error };
+  // Return the refetch function along with the data
+  return { data, count, isLoading, error, refetch: fetchData };
 }
 
 /**
@@ -92,44 +93,44 @@ export function useSupabaseRecord<T = any>(
   const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
+  const fetchRecord = useCallback(async () => {
     if (!id || !enabled) {
       setIsLoading(false);
       return;
     }
 
-    async function fetchRecord() {
-      setIsLoading(true);
-      setError(null);
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        // Break down the query into separate steps using any type to avoid type recursion
-        const query = supabase.from(tableName as any);
-        const { data, error: queryError } = await query
-          .select(select)
-          .eq(idField, id)
-          .maybeSingle();
-        
-        if (queryError) {
-          throw queryError;
-        }
-
-        setRecord(data as T);
-      } catch (err: any) {
-        setError(err);
-        console.error(`Error fetching record from ${tableName}:`, err.message);
-        toast({
-          title: `Error fetching record from ${tableName}`,
-          description: err.message,
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoading(false);
+    try {
+      // Break down the query into separate steps using any type to avoid type recursion
+      const query = supabase.from(tableName as any);
+      const { data, error: queryError } = await query
+        .select(select)
+        .eq(idField, id)
+        .maybeSingle();
+      
+      if (queryError) {
+        throw queryError;
       }
-    }
 
-    fetchRecord();
+      setRecord(data as T);
+    } catch (err: any) {
+      setError(err);
+      console.error(`Error fetching record from ${tableName}:`, err.message);
+      toast({
+        title: `Error fetching record from ${tableName}`,
+        description: err.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }, [tableName, id, idField, select, toast, enabled]);
 
-  return { record, isLoading, error };
+  useEffect(() => {
+    fetchRecord();
+  }, [fetchRecord]);
+
+  return { record, isLoading, error, refetch: fetchRecord };
 }

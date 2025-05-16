@@ -1,3 +1,4 @@
+
 import {
   LayoutDashboard,
   Calendar,
@@ -6,7 +7,7 @@ import {
   UserPlus,
   Settings,
   HelpCircle,
-  Logout,
+  LogOut,
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,11 +21,11 @@ interface NavItem {
 }
 
 const Sidebar = () => {
-  const { logout, userProfile, loading } = useAuth();
+  const { signOut, userProfile, loading } = useAuth();
   const [navigation, setNavigation] = useState<NavItem[]>([]);
 
   useEffect(() => {
-    if (userProfile?.role === 'admin') {
+    if (userProfile?.roles?.includes('Admin')) {
       setNavigation([
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'Appointments', href: '/appointments', icon: Calendar },
@@ -34,14 +35,14 @@ const Sidebar = () => {
         { label: 'Settings', href: '/settings', icon: Settings },
         { label: 'Help', href: '/help', icon: HelpCircle },
       ]);
-    } else if (userProfile?.role === 'doctor') {
+    } else if (userProfile?.roles?.includes('Doctor')) {
       setNavigation([
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'Appointments', href: '/appointments', icon: Calendar },
         { label: 'Settings', href: '/settings', icon: Settings },
         { label: 'Help', href: '/help', icon: HelpCircle },
       ]);
-    } else if (userProfile?.role === 'staff') {
+    } else if (userProfile?.roles?.includes('Staff')) {
       setNavigation([
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'Appointments', href: '/appointments', icon: Calendar },
@@ -91,10 +92,10 @@ const Sidebar = () => {
       </nav>
       <div className="p-4">
         <button
-          onClick={logout}
+          onClick={signOut}
           className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-200"
         >
-          <Logout className="mr-2 h-4 w-4" />
+          <LogOut className="mr-2 h-4 w-4" />
           Logout
         </button>
       </div>
