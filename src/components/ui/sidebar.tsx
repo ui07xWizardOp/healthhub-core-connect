@@ -8,6 +8,9 @@ import {
   Settings,
   HelpCircle,
   LogOut,
+  FileText,
+  ClipboardList,
+  UserCog
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -39,6 +42,9 @@ const Sidebar = () => {
       setNavigation([
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'Appointments', href: '/appointments', icon: Calendar },
+        { label: 'Patient Management', href: '/patient-management', icon: UserCog },
+        { label: 'Medical Records', href: '/medical-records', icon: FileText },
+        { label: 'Referrals', href: '/referrals', icon: ClipboardList },
         { label: 'Settings', href: '/settings', icon: Settings },
         { label: 'Help', href: '/help', icon: HelpCircle },
       ]);

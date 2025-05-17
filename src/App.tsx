@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +24,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import DoctorPortal from "./pages/DoctorPortal";
 import AppointmentBooking from './pages/AppointmentBooking';
+import PatientManagement from "./pages/PatientManagement";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -106,6 +108,15 @@ const App = () => (
                 <ProtectedRoute requiredPermissions={['isDoctor']}>
                   <ProfileCompletionGuard>
                     <DoctorPortal />
+                  </ProfileCompletionGuard>
+                </ProtectedRoute>
+              } />
+              
+              {/* Patient Management */}
+              <Route path="/patient-management" element={
+                <ProtectedRoute requiredPermissions={['isDoctor']}>
+                  <ProfileCompletionGuard>
+                    <PatientManagement />
                   </ProfileCompletionGuard>
                 </ProtectedRoute>
               } />

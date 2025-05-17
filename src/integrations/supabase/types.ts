@@ -885,6 +885,150 @@ export type Database = {
           },
         ]
       }
+      patient_medical_records: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: number | null
+          doctor_id: number | null
+          patient_id: number | null
+          record_date: string | null
+          record_id: string
+          record_type: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: number | null
+          doctor_id?: number | null
+          patient_id?: number | null
+          record_date?: string | null
+          record_id?: string
+          record_type?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: number | null
+          doctor_id?: number | null
+          patient_id?: number | null
+          record_date?: string | null
+          record_id?: string
+          record_type?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_medical_records_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["userid"]
+          },
+          {
+            foreignKeyName: "patient_medical_records_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["doctorid"]
+          },
+          {
+            foreignKeyName: "patient_medical_records_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "customerprofiles"
+            referencedColumns: ["customerid"]
+          },
+        ]
+      }
+      patient_referrals: {
+        Row: {
+          appointment_date: string | null
+          created_at: string | null
+          notes: string | null
+          patient_id: number | null
+          reason: string | null
+          record_id: string | null
+          referral_date: string | null
+          referral_id: string
+          referred_to_doctor_id: number | null
+          referred_to_external: string | null
+          referring_doctor_id: number | null
+          specialty: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          appointment_date?: string | null
+          created_at?: string | null
+          notes?: string | null
+          patient_id?: number | null
+          reason?: string | null
+          record_id?: string | null
+          referral_date?: string | null
+          referral_id?: string
+          referred_to_doctor_id?: number | null
+          referred_to_external?: string | null
+          referring_doctor_id?: number | null
+          specialty?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          appointment_date?: string | null
+          created_at?: string | null
+          notes?: string | null
+          patient_id?: number | null
+          reason?: string | null
+          record_id?: string | null
+          referral_date?: string | null
+          referral_id?: string
+          referred_to_doctor_id?: number | null
+          referred_to_external?: string | null
+          referring_doctor_id?: number | null
+          specialty?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_referrals_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "customerprofiles"
+            referencedColumns: ["customerid"]
+          },
+          {
+            foreignKeyName: "patient_referrals_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "patient_medical_records"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "patient_referrals_referred_to_doctor_id_fkey"
+            columns: ["referred_to_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["doctorid"]
+          },
+          {
+            foreignKeyName: "patient_referrals_referring_doctor_id_fkey"
+            columns: ["referring_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["doctorid"]
+          },
+        ]
+      }
       patientvisits: {
         Row: {
           appointmentid: number | null
