@@ -195,6 +195,7 @@ const Signup: React.FC = () => {
                       <SelectItem value="Staff">Staff</SelectItem>
                       <SelectItem value="Admin">Admin</SelectItem>
                       <SelectItem value="LabTechnician">Lab Technician</SelectItem>
+                      <SelectItem value="Doctor">Doctor</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

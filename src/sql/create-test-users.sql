@@ -34,7 +34,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Create test users
 SELECT create_test_user('admin@example.com', 'Password123!', 'Admin', 'User', 'Admin');
 SELECT create_test_user('staff@example.com', 'Password123!', 'Staff', 'User', 'Staff');
-SELECT create_test_user('doctor@example.com', 'Password123!', 'Doctor', 'User', 'Staff');
+SELECT create_test_user('doctor@example.com', 'Password123!', 'Doctor', 'User', 'Doctor');
 SELECT create_test_user('lab@example.com', 'Password123!', 'Lab', 'Technician', 'LabTechnician');
 SELECT create_test_user('customer@example.com', 'Password123!', 'John', 'Customer', 'Customer');
 
