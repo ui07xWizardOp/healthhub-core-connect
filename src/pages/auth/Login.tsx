@@ -27,7 +27,7 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   
   // Get the return URL from location state or default to dashboard
-  const from = (location.state as any)?.from?.pathname || '/';
+  const from = (location.state as any)?.from?.pathname || '/dashboard';
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -43,6 +43,7 @@ const Login: React.FC = () => {
       const { error } = await signIn(values.email, values.password);
       
       if (error) {
+        console.error("Login error:", error);
         toast.error(error.message || 'Failed to sign in');
       } else {
         toast.success('Successfully signed in!');
@@ -55,6 +56,7 @@ const Login: React.FC = () => {
         }
       }
     } catch (error: any) {
+      console.error("Unexpected login error:", error);
       toast.error(error.message || 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -148,6 +150,31 @@ const Login: React.FC = () => {
         </Form>
 
         <div className="text-center mt-6">
+          <div className="mb-4 text-gray-600">
+            <p className="text-sm">Demo Credentials:</p>
+            <div className="grid grid-cols-2 mt-1 text-xs gap-1">
+              <div className="bg-gray-50 p-1 rounded">
+                <strong>Admin:</strong> admin@example.com<br/>
+                <strong>Password:</strong> Password123!
+              </div>
+              <div className="bg-gray-50 p-1 rounded">
+                <strong>Doctor:</strong> doctor@example.com<br/>
+                <strong>Password:</strong> Password123!
+              </div>
+              <div className="bg-gray-50 p-1 rounded">
+                <strong>Staff:</strong> staff@example.com<br/>
+                <strong>Password:</strong> Password123!
+              </div>
+              <div className="bg-gray-50 p-1 rounded">
+                <strong>Lab:</strong> lab@example.com<br/>
+                <strong>Password:</strong> Password123!
+              </div>
+              <div className="bg-gray-50 p-1 rounded col-span-2">
+                <strong>Customer:</strong> customer@example.com<br/>
+                <strong>Password:</strong> Password123!
+              </div>
+            </div>
+          </div>
           <p className="text-gray-600">
             Don't have an account?{' '}
             <Link to="/signup" className="font-medium text-healthhub-orange hover:text-healthhub-orange/80">
