@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -44,61 +43,20 @@ const PatientHistory: React.FC = () => {
   const { data: patients, isLoading } = useQuery({
     queryKey: ['doctor-patients', userProfile?.doctorId],
     queryFn: async () => {
-      // First get appointments with this doctor to find all patients
-      const { data: appointmentData, error: appointmentError } = await supabase
-        .from('appointments')
-        .select(`
-          customerid,
-          appointmentdate
-        `)
-        .eq('doctorid', userProfile?.doctorId)
-        .order('appointmentdate', { ascending: false });
+      if (!userProfile?.doctorId) return [];
       
-      if (appointmentError) throw appointmentError;
+      const { data, error } = await supabase.rpc('get_doctor_patients', {
+        p_doctor_id: userProfile.doctorId,
+      });
+
+      if (error) {
+        console.error('Error fetching doctor patients:', error);
+        throw error;
+      }
       
-      // Get unique customer IDs
-      const uniqueCustomerIds = [...new Set(appointmentData?.map(a => a.customerid))];
-      
-      if (uniqueCustomerIds.length === 0) return [];
-      
-      // Get customer details
-      const { data: customerData, error: customerError } = await supabase
-        .from('users')
-        .select(`
-          userid,
-          firstname,
-          lastname,
-          customerprofiles:customerprofiles(
-            dateofbirth,
-            gender,
-            bloodgroup
-          )
-        `)
-        .in('userid', uniqueCustomerIds);
-      
-      if (customerError) throw customerError;
-      
-      // Map data to get patient information with last visit date
-      return customerData?.map(customer => {
-        // Find the most recent appointment for this patient
-        const patientAppointments = appointmentData
-          .filter(a => a.customerid === customer.userid)
-          .sort((a, b) => new Date(b.appointmentdate).getTime() - new Date(a.appointmentdate).getTime());
-        
-        const lastVisit = patientAppointments.length > 0 ? patientAppointments[0].appointmentdate : null;
-        
-        return {
-          customerid: customer.userid,
-          firstname: customer.firstname,
-          lastname: customer.lastname,
-          gender: customer.customerprofiles?.[0]?.gender,
-          dateofbirth: customer.customerprofiles?.[0]?.dateofbirth,
-          bloodgroup: customer.customerprofiles?.[0]?.bloodgroup,
-          lastvisit: lastVisit
-        };
-      }) || [];
+      return (data as Patient[]) || [];
     },
-    enabled: !!userProfile?.doctorId
+    enabled: !!userProfile?.doctorId,
   });
 
   // Filter patients based on search query
