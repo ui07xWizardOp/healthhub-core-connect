@@ -8,7 +8,9 @@ import AppointmentManagement from '@/components/doctor/AppointmentManagement';
 import PrescriptionManagement from '@/components/doctor/PrescriptionManagement';
 import PatientHistory from '@/components/doctor/PatientHistory';
 import ScheduleManagement from '@/components/doctor/ScheduleManagement';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
 
 const DoctorPortal: React.FC = () => {
   const { isDoctor, userProfile, loading } = useAuth();
@@ -56,6 +58,14 @@ const DoctorPortal: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="prescriptions" className="mt-0">
+            <div className="flex justify-end mb-4">
+              <Button asChild>
+                <Link to="/new-prescription">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  New Prescription
+                </Link>
+              </Button>
+            </div>
             <PrescriptionManagement />
           </TabsContent>
           

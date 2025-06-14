@@ -117,11 +117,11 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ---
 
 ## 📅 Phase 2: Patient & Doctor Experience (3-4 weeks)
-**Status**: 🟡 40% Complete | **Timeline**: Week 4-7
+**Status**: 🟡 45% Complete | **Timeline**: Week 4-7
 
 ### 2.1 Patient Dashboard 🟡 30% COMPLETE
 - ✅ **MT-2.1.1**: Create basic patient dashboard layout
-- 🔄 **MT-2.1.2**: Implement appointment booking interface (PARTIAL)
+- 🔄 **MT-2.1.2**: Complete appointment booking interface
 - ⭕ **MT-2.1.3**: Build test results viewer component
 - ⭕ **MT-2.1.4**: Create prescription history display
 - ⭕ **MT-2.1.5**: Implement medication tracking system
@@ -132,7 +132,7 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ### 2.2 Doctor Portal 🟡 50% COMPLETE
 - ✅ **MT-2.2.1**: Create doctor dashboard layout
 - 🔄 **MT-2.2.2**: Implement appointment management (PARTIAL)
-- 🔄 **MT-2.2.3**: Build prescription writing system (IN PROGRESS)
+- ✅ **MT-2.2.3**: Build prescription writing system (COMPLETED)
 - 🔄 **MT-2.2.4**: Create patient history viewer (PARTIAL)
 - 🔄 **MT-2.2.5**: Develop schedule management (PARTIAL)
 - ⭕ **MT-2.2.6**: Add patient search functionality
@@ -235,7 +235,6 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 
 ### 🔥 **Immediate Next Tasks** (Week 4):
 1. **MT-2.1.2**: Complete appointment booking interface
-2. **MT-2.2.3**: Implement prescription writing system
 
 ### ⚡ **High Priority** (Week 4-5):
 1. **MT-2.1.3**: Build test results viewer
@@ -259,11 +258,11 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 
 ## 📊 Overall Progress
 - **Phase 1**: 100% Complete (40/40 microtasks)
-- **Phase 2**: 40% Complete (10/24 microtasks) 
+- **Phase 2**: 45% Complete (11/24 microtasks) 
 - **Phase 3**: 10% Complete (2/24 microtasks)
 - **Phase 4**: 15% Complete (5/32 microtasks)
 
-**Total Project Progress**: 47.5% Complete (57/120 microtasks)
+**Total Project Progress**: 48% Complete (58/120 microtasks)
 
 ---
 

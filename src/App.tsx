@@ -23,6 +23,7 @@ import Employees from "./pages/Employees";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import DoctorPortal from "./pages/DoctorPortal";
+import NewPrescriptionPage from "./pages/NewPrescription";
 import AppointmentBooking from './pages/AppointmentBooking';
 import PatientManagement from "./pages/PatientManagement";
 
@@ -112,6 +113,14 @@ const App = () => (
                 </ProtectedRoute>
               } />
               
+              <Route path="/new-prescription" element={
+                <ProtectedRoute requiredPermissions={['isDoctor']}>
+                  <ProfileCompletionGuard>
+                    <NewPrescriptionPage />
+                  </ProfileCompletionGuard>
+                </ProtectedRoute>
+              } />
+
               {/* Patient Management */}
               <Route path="/patient-management" element={
                 <ProtectedRoute requiredPermissions={['isDoctor']}>
