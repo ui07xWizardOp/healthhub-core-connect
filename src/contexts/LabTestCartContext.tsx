@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { LabTest, TestPanel } from '@/types/supabase';
 import { toast } from 'sonner';
@@ -45,9 +44,11 @@ export const LabTestCartProvider: React.FC<{ children: ReactNode }> = ({ childre
   const removeFromCart = (itemId: number, itemType: 'test' | 'panel') => {
     setCartItems((prevItems) => {
       const itemToRemove = prevItems.find(item => {
-        if (item.type === itemType) {
-          if (itemType === 'test' && item.testid === itemId) return true;
-          if (itemType === 'panel' && item.panelid === itemId) return true;
+        if (item.type === 'test' && itemType === 'test') {
+          return item.testid === itemId;
+        }
+        if (item.type === 'panel' && itemType === 'panel') {
+          return item.panelid === itemId;
         }
         return false;
       });
