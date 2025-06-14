@@ -64,13 +64,18 @@ const CreateReferralDialog: React.FC<CreateReferralDialogProps> = ({ open, onOpe
     }
 
     try {
-      const doctorForTitle = newReferral.is_external 
-        ? newReferral.referred_to_external 
-        : doctors?.find(d => d.doctorid === newReferral.referred_to_doctor_id);
-
-      const titleName = newReferral.is_external 
-        ? doctorForTitle 
-        : `Dr. ${doctorForTitle?.firstname} ${doctorForTitle?.lastname}`;
+      let titleName: string;
+      if (newReferral.is_external) {
+        titleName = newReferral.referred_to_external;
+      } else {
+        const doctor = doctors?.find(d => d.doctorid === newReferral.referred_to_doctor_id);
+        if (doctor) {
+          titleName = `Dr. ${doctor.firstname} ${doctor.lastname}`;
+        } else {
+          toast.error("Internal doctor not found.");
+          return;
+        }
+      }
       
       const { data: recordData, error: recordError } = await supabase
         .from('patient_medical_records')

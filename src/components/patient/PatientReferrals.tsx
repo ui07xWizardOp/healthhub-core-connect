@@ -24,7 +24,7 @@ const PatientReferrals: React.FC = () => {
 
   const { data: referrals, isLoading, refetch } = useQuery({
     queryKey: ['patient-referrals', selectedPatientId],
-    queryFn: async () => {
+    queryFn: async (): Promise<PatientReferral[]> => {
       if (!selectedPatientId) return [];
       const { data, error } = await supabase
         .from('patient_referrals')
@@ -32,7 +32,7 @@ const PatientReferrals: React.FC = () => {
         .eq('patient_id', selectedPatientId)
         .order('referral_date', { ascending: false });
       if (error) throw error;
-      return data || [];
+      return (data as PatientReferral[]) || [];
     },
     enabled: !!selectedPatientId
   });
