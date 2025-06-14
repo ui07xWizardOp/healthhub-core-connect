@@ -50,7 +50,7 @@ const PrescriptionManagement: React.FC = () => {
           customerid,
           prescriptiondate,
           expirydate,
-          users!inner (firstname, lastname),
+          customerprofiles!inner(users!inner(firstname, lastname)),
           prescriptionitems (prescriptionitemid)
         `)
         .eq('doctorid', userProfile?.doctorId)
@@ -58,11 +58,11 @@ const PrescriptionManagement: React.FC = () => {
       
       if (error) throw error;
       
-      return data.map((prescription) => ({
+      return data.map((prescription: any) => ({
         prescriptionid: prescription.prescriptionid,
         customerid: prescription.customerid,
-        customerFirstName: prescription.users.firstname,
-        customerLastName: prescription.users.lastname,
+        customerFirstName: prescription.customerprofiles.users.firstname,
+        customerLastName: prescription.customerprofiles.users.lastname,
         prescriptiondate: prescription.prescriptiondate,
         expirydate: prescription.expirydate,
         itemcount: prescription.prescriptionitems?.length || 0

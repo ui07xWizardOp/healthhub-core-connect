@@ -30,7 +30,7 @@ const PrescriptionDetailsDialog: React.FC<PrescriptionDetailsDialogProps> = ({ p
           prescriptiondate,
           expirydate,
           notes,
-          users!inner (firstname, lastname, email),
+          customerprofiles!inner(users!inner(firstname, lastname, email)),
           prescriptionitems (
             dosage,
             frequency,
@@ -68,8 +68,8 @@ const PrescriptionDetailsDialog: React.FC<PrescriptionDetailsDialogProps> = ({ p
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h3 className="font-semibold text-gray-800">Patient Information</h3>
-                <p className="text-sm">{prescriptionDetails.users?.firstname} {prescriptionDetails.users?.lastname}</p>
-                <p className="text-xs text-muted-foreground">{prescriptionDetails.users?.email}</p>
+                <p className="text-sm">{prescriptionDetails.customerprofiles.users.firstname} {prescriptionDetails.customerprofiles.users.lastname}</p>
+                <p className="text-xs text-muted-foreground">{prescriptionDetails.customerprofiles.users.email}</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800">Prescription Information</h3>
