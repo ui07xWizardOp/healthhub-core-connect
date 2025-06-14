@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -21,12 +21,9 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { format } from 'date-fns';
-import { FileText, Plus, Search, User } from 'lucide-react';
-import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
-import PrescriptionForm from '@/components/pharmacy/PrescriptionForm';
+import { FileText, Search, User } from 'lucide-react';
+import PrescriptionDetailsDialog from '@/components/doctor/PrescriptionDetailsDialog';
 
-// Fix the interface to match the data structure returned from Supabase
 interface Prescription {
   prescriptionid: number;
   customerid: number;
@@ -34,19 +31,18 @@ interface Prescription {
   customerLastName: string;
   prescriptiondate: string;
   expirydate: string | null;
-  itemcount: number; // Changed from itemCount to itemcount to match database field
+  itemcount: number;
 }
 
 const PrescriptionManagement: React.FC = () => {
   const { userProfile } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPrescription, setSelectedPrescription] = useState<any | null>(null);
+  const [selectedPrescriptionId, setSelectedPrescriptionId] = useState<number | null>(null);
   
-  // Fetch doctor's prescriptions using direct query instead of RPC
-  const { data: prescriptions, isLoading, refetch } = useQuery({
+  const { data: prescriptions, isLoading } = useQuery({
     queryKey: ['doctor-prescriptions', userProfile?.doctorId],
     queryFn: async () => {
-      // Using direct query instead of RPC
+      if (!userProfile?.doctorId) return [];
       const { data, error } = await supabase
         .from('prescriptions')
         .select(`
@@ -57,11 +53,11 @@ const PrescriptionManagement: React.FC = () => {
           users!inner (firstname, lastname),
           prescriptionitems (prescriptionitemid)
         `)
-        .eq('doctorid', userProfile?.doctorId);
+        .eq('doctorid', userProfile?.doctorId)
+        .order('prescriptiondate', { ascending: false });
       
       if (error) throw error;
       
-      // Transform the data to match our expected format
       return data.map((prescription) => ({
         prescriptionid: prescription.prescriptionid,
         customerid: prescription.customerid,
@@ -75,7 +71,6 @@ const PrescriptionManagement: React.FC = () => {
     enabled: !!userProfile?.doctorId
   });
 
-  // Filter prescriptions based on search query
   const filteredPrescriptions = prescriptions ? prescriptions.filter(
     (prescription: Prescription) => {
       const fullName = `${prescription.customerFirstName} ${prescription.customerLastName}`.toLowerCase();
@@ -84,31 +79,22 @@ const PrescriptionManagement: React.FC = () => {
     }
   ) : [];
 
-  const handleViewPrescription = (prescription: any) => {
-    setSelectedPrescription(prescription);
+  const handleViewPrescription = (prescriptionId: number) => {
+    setSelectedPrescriptionId(prescriptionId);
   };
 
   const handleClosePrescriptionDialog = () => {
-    setSelectedPrescription(null);
-    refetch();
+    setSelectedPrescriptionId(null);
   };
 
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="space-y-1">
-            <CardTitle>Prescriptions</CardTitle>
-            <CardDescription>
-              View and manage prescriptions for your patients
-            </CardDescription>
-          </div>
-          <Button asChild>
-            <Link to="/prescriptions/new">
-              <Plus className="mr-2 h-4 w-4" />
-              New Prescription
-            </Link>
-          </Button>
+        <CardHeader>
+          <CardTitle>Issued Prescriptions</CardTitle>
+          <CardDescription>
+            View and manage prescriptions you have issued for your patients.
+          </CardDescription>
         </CardHeader>
         
         <CardContent>
@@ -123,10 +109,10 @@ const PrescriptionManagement: React.FC = () => {
           </div>
 
           {isLoading ? (
-            <div className="animate-pulse">
-              <div className="h-10 bg-gray-100 w-full mb-4 rounded"></div>
-              <div className="h-10 bg-gray-100 w-full mb-4 rounded"></div>
-              <div className="h-10 bg-gray-100 w-full rounded"></div>
+            <div className="space-y-2">
+              <div className="h-10 bg-gray-200 animate-pulse w-full rounded"></div>
+              <div className="h-10 bg-gray-200 animate-pulse w-full rounded"></div>
+              <div className="h-10 bg-gray-200 animate-pulse w-full rounded"></div>
             </div>
           ) : filteredPrescriptions && filteredPrescriptions.length > 0 ? (
             <div className="border rounded-md">
@@ -147,7 +133,7 @@ const PrescriptionManagement: React.FC = () => {
                       <TableCell className="font-medium">{prescription.prescriptionid}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <User className="h-4 w-4" />
+                          <User className="h-4 w-4 text-muted-foreground" />
                           {prescription.customerFirstName} {prescription.customerLastName}
                         </div>
                       </TableCell>
@@ -164,7 +150,7 @@ const PrescriptionManagement: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleViewPrescription(prescription)}
+                          onClick={() => handleViewPrescription(prescription.prescriptionid)}
                         >
                           <FileText className="h-4 w-4" />
                           <span className="sr-only">View</span>
@@ -176,8 +162,12 @@ const PrescriptionManagement: React.FC = () => {
               </Table>
             </div>
           ) : (
-            <div className="text-center py-10">
-              <p className="text-gray-500">No prescriptions found.</p>
+            <div className="text-center py-10 border rounded-md">
+              <FileText className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No prescriptions found</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                {searchQuery ? "Try a different search term." : "New prescriptions you create will appear here."}
+              </p>
               {searchQuery && (
                 <Button
                   variant="link"
@@ -192,9 +182,9 @@ const PrescriptionManagement: React.FC = () => {
         </CardContent>
       </Card>
       
-      {selectedPrescription && (
-        <PrescriptionForm
-          prescription={selectedPrescription}
+      {selectedPrescriptionId && (
+        <PrescriptionDetailsDialog
+          prescriptionId={selectedPrescriptionId}
           onClose={handleClosePrescriptionDialog}
         />
       )}
@@ -203,3 +193,4 @@ const PrescriptionManagement: React.FC = () => {
 };
 
 export default PrescriptionManagement;
+
