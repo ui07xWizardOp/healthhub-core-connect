@@ -132,7 +132,7 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ### 2.2 Doctor Portal 🟡 50% COMPLETE
 - ✅ **MT-2.2.1**: Create doctor dashboard layout
 - 🔄 **MT-2.2.2**: Implement appointment management (PARTIAL)
-- ⭕ **MT-2.2.3**: Build prescription writing system
+- 🔄 **MT-2.2.3**: Build prescription writing system (IN PROGRESS)
 - 🔄 **MT-2.2.4**: Create patient history viewer (PARTIAL)
 - 🔄 **MT-2.2.5**: Develop schedule management (PARTIAL)
 - ⭕ **MT-2.2.6**: Add patient search functionality

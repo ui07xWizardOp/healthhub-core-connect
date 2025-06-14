@@ -2066,6 +2066,23 @@ export type Database = {
         Args: { user_id: string; required_role: string }
         Returns: boolean
       }
+      search_customers: {
+        Args: { p_search_term: string }
+        Returns: {
+          userid: number
+          firstname: string
+          lastname: string
+          email: string
+        }[]
+      }
+      search_products: {
+        Args: { p_search_term: string }
+        Returns: {
+          productid: number
+          productname: string
+          strength: string
+        }[]
+      }
       update_user_profile: {
         Args: {
           p_user_id: string
