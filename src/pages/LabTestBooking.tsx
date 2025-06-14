@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -13,12 +12,12 @@ import { toast } from 'sonner';
 
 const LabTestBooking: React.FC = () => {
   const { cartItems, removeFromCart, clearCart, cartCount, totalPrice } = useLabTestCart();
-  const { profile } = useAuth();
+  const { userProfile } = useAuth();
   const navigate = useNavigate();
   const [isBooking, setIsBooking] = useState(false);
 
   const handleProceedToBook = async () => {
-    if (!profile) {
+    if (!userProfile) {
       toast.error("You must be logged in to book tests.", {
         description: "Please log in or create an account to continue.",
       });
@@ -37,11 +36,11 @@ const LabTestBooking: React.FC = () => {
       const { data: labOrder, error: orderError } = await supabase
         .from('laborders')
         .insert({
-          customerid: profile.userid,
+          customerid: userProfile.userid,
           totalamount: totalPrice,
           paymentmethod: 'Online', // Placeholder
           status: 'Ordered',
-          createdby: profile.userid,
+          createdby: userProfile.userid,
           resultdeliverymethod: 'Email' // Placeholder
         })
         .select()
