@@ -15,12 +15,19 @@ interface LabTest {
   turnaroundtime: number; // in hours
 }
 
-const fetchLabTests = async () => {
-  const { data, error } = await supabase
+const fetchLabTests = async (searchTerm: string) => {
+  let query = supabase
     .from('labtests')
     .select('*')
-    .eq('isactive', true)
-    .order('testname', { ascending: true });
+    .eq('isactive', true);
+
+  if (searchTerm) {
+    query = query.or(`testname.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+  }
+
+  query = query.order('testname', { ascending: true });
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(error.message);
@@ -57,10 +64,10 @@ const LabTestCard: React.FC<{ test: LabTest }> = ({ test }) => {
   );
 };
 
-const LabTestsList: React.FC = () => {
+const LabTestsList: React.FC<{ searchTerm: string }> = ({ searchTerm }) => {
   const { data: tests, isLoading, isError, error } = useQuery({
-    queryKey: ['labTests'],
-    queryFn: fetchLabTests,
+    queryKey: ['labTests', searchTerm],
+    queryFn: () => fetchLabTests(searchTerm),
   });
 
   if (isLoading) {
@@ -88,6 +95,17 @@ const LabTestsList: React.FC = () => {
 
   if (isError) {
     return <div className="text-center text-red-500">Error fetching lab tests: {error instanceof Error ? error.message : 'An unknown error occurred'}</div>;
+  }
+
+  if (tests?.length === 0) {
+    return (
+      <div className="text-center col-span-1 md:col-span-2 lg:col-span-3 py-16">
+        <h3 className="text-xl font-semibold text-gray-700">No Results Found</h3>
+        <p className="text-gray-500 mt-2">
+          We couldn't find any lab tests matching your search for "{searchTerm}".
+        </p>
+      </div>
+    );
   }
 
   return (
