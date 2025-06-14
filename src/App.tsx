@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PermissionsProvider } from "@/contexts/PermissionsContext";
+import { LabTestCartProvider } from "@/contexts/LabTestCartContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import ProfileCompletionGuard from "@/components/auth/ProfileCompletionGuard";
 import Index from "./pages/Index";
@@ -28,6 +28,7 @@ import AppointmentBooking from './pages/AppointmentBooking';
 import PatientManagement from "./pages/PatientManagement";
 import Services from "./pages/Services";
 import LabTests from "./pages/LabTests";
+import LabTestBooking from "./pages/LabTestBooking";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -36,116 +37,119 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <PermissionsProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              
-              {/* Profile Completion Route */}
-              <Route path="/complete-profile" element={
-                <ProtectedRoute>
-                  <ProfileCompletion />
-                </ProtectedRoute>
-              } />
-              
-              {/* Protected Routes with Profile Completion Check */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <ProfileCompletionGuard>
-                    <Dashboard />
-                  </ProfileCompletionGuard>
-                </ProtectedRoute>
-              } />
-              <Route path="/pharmacy" element={
-                <ProtectedRoute requiredPermissions={['isStaff']}>
-                  <ProfileCompletionGuard>
-                    <Pharmacy />
-                  </ProfileCompletionGuard>
-                </ProtectedRoute>
-              } />
-              <Route path="/laboratory" element={
-                <ProtectedRoute requiredPermissions={['isStaff']}>
-                  <ProfileCompletionGuard>
-                    <Laboratory />
-                  </ProfileCompletionGuard>
-                </ProtectedRoute>
-              } />
-              <Route path="/customers" element={
-                <ProtectedRoute requiredPermissions={['isStaff', 'isDoctor']}>
-                  <ProfileCompletionGuard>
-                    <Customers />
-                  </ProfileCompletionGuard>
-                </ProtectedRoute>
-              } />
-              <Route path="/inventory" element={
-                <ProtectedRoute requiredPermissions={['isStaff']}>
-                  <ProfileCompletionGuard>
-                    <Inventory />
-                  </ProfileCompletionGuard>
-                </ProtectedRoute>
-              } />
-              <Route path="/employees" element={
-                <ProtectedRoute requiredRoles={['Admin']}>
-                  <ProfileCompletionGuard>
-                    <Employees />
-                  </ProfileCompletionGuard>
-                </ProtectedRoute>
-              } />
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <ProfileCompletionGuard>
-                    <Settings />
-                  </ProfileCompletionGuard>
-                </ProtectedRoute>
-              } />
-              
-              {/* Doctor Portal */}
-              <Route path="/doctor-portal" element={
-                <ProtectedRoute requiredPermissions={['isDoctor']}>
-                  <ProfileCompletionGuard>
-                    <DoctorPortal />
-                  </ProfileCompletionGuard>
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/new-prescription" element={
-                <ProtectedRoute requiredPermissions={['isDoctor']}>
-                  <ProfileCompletionGuard>
-                    <NewPrescriptionPage />
-                  </ProfileCompletionGuard>
-                </ProtectedRoute>
-              } />
+        <LabTestCartProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                
+                {/* Profile Completion Route */}
+                <Route path="/complete-profile" element={
+                  <ProtectedRoute>
+                    <ProfileCompletion />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Protected Routes with Profile Completion Check */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <ProfileCompletionGuard>
+                      <Dashboard />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
+                <Route path="/pharmacy" element={
+                  <ProtectedRoute requiredPermissions={['isStaff']}>
+                    <ProfileCompletionGuard>
+                      <Pharmacy />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
+                <Route path="/laboratory" element={
+                  <ProtectedRoute requiredPermissions={['isStaff']}>
+                    <ProfileCompletionGuard>
+                      <Laboratory />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
+                <Route path="/customers" element={
+                  <ProtectedRoute requiredPermissions={['isStaff', 'isDoctor']}>
+                    <ProfileCompletionGuard>
+                      <Customers />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
+                <Route path="/inventory" element={
+                  <ProtectedRoute requiredPermissions={['isStaff']}>
+                    <ProfileCompletionGuard>
+                      <Inventory />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
+                <Route path="/employees" element={
+                  <ProtectedRoute requiredRoles={['Admin']}>
+                    <ProfileCompletionGuard>
+                      <Employees />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <ProfileCompletionGuard>
+                      <Settings />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
+                
+                {/* Doctor Portal */}
+                <Route path="/doctor-portal" element={
+                  <ProtectedRoute requiredPermissions={['isDoctor']}>
+                    <ProfileCompletionGuard>
+                      <DoctorPortal />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/new-prescription" element={
+                  <ProtectedRoute requiredPermissions={['isDoctor']}>
+                    <ProfileCompletionGuard>
+                      <NewPrescriptionPage />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
 
-              {/* Patient Management */}
-              <Route path="/patient-management" element={
-                <ProtectedRoute requiredPermissions={['isDoctor']}>
-                  <ProfileCompletionGuard>
-                    <PatientManagement />
-                  </ProfileCompletionGuard>
-                </ProtectedRoute>
-              } />
-              
-              {/* Placeholders - will be protected in the future */}
-              <Route path="/services" element={<Services />} />
-              <Route path="/doctors" element={<NotFound />} />
-              <Route path="/lab-tests" element={<LabTests />} />
-              <Route path="/contact" element={<NotFound />} />
-              
-              {/* Add the new route */}
-              <Route path="/appointments" element={<AppointmentBooking />} />
-              
-              {/* Catch all route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+                {/* Patient Management */}
+                <Route path="/patient-management" element={
+                  <ProtectedRoute requiredPermissions={['isDoctor']}>
+                    <ProfileCompletionGuard>
+                      <PatientManagement />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
+                
+                {/* Placeholders - will be protected in the future */}
+                <Route path="/services" element={<Services />} />
+                <Route path="/doctors" element={<NotFound />} />
+                <Route path="/lab-tests" element={<LabTests />} />
+                <Route path="/lab-tests/book" element={<LabTestBooking />} />
+                <Route path="/contact" element={<NotFound />} />
+                
+                {/* Add the new route */}
+                <Route path="/appointments" element={<AppointmentBooking />} />
+                
+                {/* Catch all route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </LabTestCartProvider>
       </PermissionsProvider>
     </AuthProvider>
   </QueryClientProvider>

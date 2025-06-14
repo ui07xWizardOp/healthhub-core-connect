@@ -4,22 +4,16 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Droplet, Clock } from 'lucide-react';
+import { Droplet, Clock, ShoppingCart } from 'lucide-react';
+import { LabTest } from '@/types/supabase';
+import { useLabTestCart } from '@/contexts/LabTestCartContext';
 
-interface LabTest {
-  testid: number;
-  testname: string;
-  description: string;
-  price: number;
-  sampletype: string;
-  turnaroundtime: number; // in hours
-}
-
-const fetchLabTests = async (searchTerm: string) => {
+const fetchLabTests = async (searchTerm: string): Promise<LabTest[]> => {
   let query = supabase
     .from('labtests')
     .select('*')
-    .eq('isactive', true);
+    .eq('isactive', true)
+    .not('price', 'is', null);
 
   if (searchTerm) {
     query = query.or(`testname.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
@@ -36,27 +30,34 @@ const fetchLabTests = async (searchTerm: string) => {
 };
 
 const LabTestCard: React.FC<{ test: LabTest }> = ({ test }) => {
+  const { addToCart } = useLabTestCart();
+
   return (
     <Card className="flex flex-col h-full transition-all duration-200 hover:shadow-md">
       <CardHeader>
         <CardTitle>{test.testname}</CardTitle>
-        <CardDescription>{test.description}</CardDescription>
+        <CardDescription>{test.description || 'No description available.'}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
         <div className="flex items-center text-sm text-gray-600">
           <Droplet className="mr-2 h-4 w-4 text-healthhub-blue" />
-          <span>Sample Type: {test.sampletype}</span>
+          <span>Sample Type: {test.sampletype || 'N/A'}</span>
         </div>
         <div className="flex items-center text-sm text-gray-600">
           <Clock className="mr-2 h-4 w-4 text-healthhub-blue" />
-          <span>Results in: {test.turnaroundtime} hours</span>
+          <span>Results in: {test.turnaroundtime ? `${test.turnaroundtime} hours` : 'N/A'}</span>
         </div>
         <div className="text-2xl font-bold text-gray-800 mt-4">
-          ₹{test.price.toFixed(2)}
+          {test.price ? `₹${test.price.toFixed(2)}` : 'Price not available'}
         </div>
       </CardContent>
       <CardFooter>
-        <Button className="w-full bg-healthhub-orange text-white hover:bg-healthhub-orange/90">
+        <Button
+          className="w-full bg-healthhub-orange text-white hover:bg-healthhub-orange/90"
+          onClick={() => addToCart(test)}
+          disabled={!test.price}
+        >
+          <ShoppingCart className="mr-2 h-4 w-4" />
           Book Test
         </Button>
       </CardFooter>
