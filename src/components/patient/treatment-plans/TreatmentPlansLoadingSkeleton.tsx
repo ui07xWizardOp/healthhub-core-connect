@@ -1,12 +1,13 @@
 
 import React from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const TreatmentPlansLoadingSkeleton: React.FC = () => {
   return (
-    <div className="mt-4 animate-pulse">
-      <div className="h-10 bg-gray-100 w-full mb-4 rounded"></div>
-      <div className="h-10 bg-gray-100 w-full mb-4 rounded"></div>
-      <div className="h-10 bg-gray-100 w-full rounded"></div>
+    <div className="mt-4 space-y-2">
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
     </div>
   );
 };

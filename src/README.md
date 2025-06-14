@@ -117,7 +117,7 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ---
 
 ## 📅 Phase 2: Patient & Doctor Experience (3-4 weeks)
-**Status**: 🟡 65% Complete | **Timeline**: Week 4-7
+**Status**: 🟡 70% Complete | **Timeline**: Week 4-7
 
 ### 2.1 Patient Dashboard 🟡 50% COMPLETE
 - ✅ **MT-2.1.1**: Create basic patient dashboard layout
@@ -129,14 +129,14 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 - ⭕ **MT-2.1.7**: Create health summary dashboard
 - ⭕ **MT-2.1.8**: Implement payment history viewer
 
-### 2.2 Doctor Portal 🟡 65% COMPLETE
+### 2.2 Doctor Portal 🟡 70% COMPLETE
 - ✅ **MT-2.2.1**: Create doctor dashboard layout
 - 🔄 **MT-2.2.2**: Implement appointment management (PARTIAL)
 - ✅ **MT-2.2.3**: Build prescription writing system (COMPLETED)
 - 🟡 **MT-2.2.4**: Create patient history viewer (PARTIAL COMPLETE)
 - 🔄 **MT-2.2.5**: Develop schedule management (PARTIAL)
 - ✅ **MT-2.2.6**: Add patient search functionality
-- ⭕ **MT-2.2.7**: Implement visit notes system
+- 🟡 **MT-2.2.7**: Implement visit notes system (PARTIAL)
 - ⭕ **MT-2.2.8**: Create prescription templates
 
 ### 2.3 Appointment System 🟡 60% COMPLETE
@@ -211,11 +211,11 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 
 ## 📊 Overall Progress
 - **Phase 1**: 100% Complete (40/40 microtasks)
-- **Phase 2**: 65% Complete (15.6/24 microtasks) 
+- **Phase 2**: 70% Complete (16.8/24 microtasks) 
 - **Phase 3**: 12.5% Complete (3/24 microtasks)
 - **Phase 4**: 15% Complete (5/32 microtasks)
 
-**Total Project Progress**: 54% Complete (63.6/120 microtasks)
+**Total Project Progress**: 56% Complete (66.8/120 microtasks)
 
 ---
 

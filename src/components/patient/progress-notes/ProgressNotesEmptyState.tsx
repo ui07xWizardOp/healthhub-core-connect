@@ -13,9 +13,9 @@ const ProgressNotesEmptyState: React.FC<ProgressNotesEmptyStateProps> = ({ hasSe
     return (
       <div className="flex flex-col items-center justify-center text-center py-12">
         <FileText className="h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-1">No progress notes</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-1">No progress notes found</h3>
         <p className="text-gray-500 mb-4">This patient doesn't have any progress notes yet.</p>
-        <Button onClick={onAddNote}>Create Progress Note</Button>
+        <Button onClick={onAddNote}>Add Progress Note</Button>
       </div>
     );
   }
