@@ -3,14 +3,14 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { LabOrder } from '@/types/supabase';
+import { LabOrder, LabOrderItem } from '@/types/supabase';
 import LabOrderResultCard from './LabOrderResultCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Inbox } from 'lucide-react';
 
 // Define a more detailed type for our query
 export type LabOrderWithResults = LabOrder & {
-  laborderitems: ({
+  laborderitems: (LabOrderItem & {
     labtests: {
       testname: string;
       units: string | null;
