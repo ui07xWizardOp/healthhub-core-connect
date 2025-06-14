@@ -2024,6 +2024,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_current_doctor_id: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_current_user_id: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       get_doctor_prescriptions: {
         Args: { p_doctor_id: number }
         Returns: {

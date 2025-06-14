@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +23,7 @@ const PatientReferrals: React.FC = () => {
   const [viewingReferral, setViewingReferral] = useState<PatientReferral | null>(null);
 
   const { data: referrals, isLoading, refetch } = useQuery({
-    queryKey: ['patient-referrals', selectedPatientId],
+    queryKey: ['patient-referrals', selectedPatientId, userProfile?.doctorId],
     queryFn: async (): Promise<PatientReferral[]> => {
       if (!selectedPatientId) return [];
       const { data, error } = await supabase
