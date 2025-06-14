@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,6 +31,7 @@ import LabTests from "./pages/LabTests";
 import LabTestBooking from "./pages/LabTestBooking";
 import HealthPackages from "./pages/HealthPackages";
 import AppointmentBookingPage from "./pages/AppointmentBookingPage";
+import TestResultsPage from "./pages/TestResultsPage";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -145,6 +147,13 @@ const App = () => (
                 
                 {/* Add the new route */}
                 <Route path="/appointments" element={<AppointmentBookingPage />} />
+                <Route path="/my-results" element={
+                  <ProtectedRoute requiredPermissions={['isCustomer']}>
+                    <ProfileCompletionGuard>
+                      <TestResultsPage />
+                    </ProfileCompletionGuard>
+                  </ProtectedRoute>
+                } />
                 
                 {/* Catch all route */}
                 <Route path="*" element={<NotFound />} />

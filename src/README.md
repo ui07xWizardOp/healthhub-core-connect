@@ -117,12 +117,12 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ---
 
 ## 📅 Phase 2: Patient & Doctor Experience (3-4 weeks)
-**Status**: 🟡 54% Complete | **Timeline**: Week 4-7
+**Status**: 🟡 58% Complete | **Timeline**: Week 4-7
 
-### 2.1 Patient Dashboard 🟡 40% COMPLETE
+### 2.1 Patient Dashboard 🟡 50% COMPLETE
 - ✅ **MT-2.1.1**: Create basic patient dashboard layout
 - ✅ **MT-2.1.2**: Complete appointment booking interface
-- ⭕ **MT-2.1.3**: Build test results viewer component
+- ✅ **MT-2.1.3**: Build test results viewer component
 - ⭕ **MT-2.1.4**: Create prescription history display
 - ⭕ **MT-2.1.5**: Implement medication tracking system
 - ⭕ **MT-2.1.6**: Add upcoming appointments widget
@@ -189,18 +189,17 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ## 🎯 Current Priority Queue
 
 ### 🔥 **Immediate Next Tasks** (Week 4):
-1. **MT-2.1.3**: Build test results viewer component
+1. **MT-2.3.3**: Build real-time slot booking
 
 ### ⚡ **High Priority** (Week 4-5):
-1. **MT-2.3.3**: Build real-time slot booking
-2. **MT-2.2.6**: Add patient search functionality
-3. **MT-3.1.1**: Create prescription validation system
-4. **MT-3.2.2**: Implement test ordering workflow
+1. **MT-2.2.6**: Add patient search functionality
+2. **MT-3.1.1**: Create prescription validation system
+3. **MT-3.3.2**: Implement batch management system
 
 ### 📌 **Medium Priority** (Week 5-6):
-1. **MT-3.3.2**: Implement batch management system
-2. **MT-2.1.4**: Create prescription history display
-3. **MT-2.3.4**: Add appointment notifications
+1. **MT-2.1.4**: Create prescription history display
+2. **MT-2.3.4**: Add appointment notifications
+3. **MT-3.2.3**: Build sample collection tracking
 
 ---
 
@@ -212,11 +211,11 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 
 ## 📊 Overall Progress
 - **Phase 1**: 100% Complete (40/40 microtasks)
-- **Phase 2**: 54% Complete (13/24 microtasks) 
+- **Phase 2**: 58% Complete (14/24 microtasks) 
 - **Phase 3**: 12.5% Complete (3/24 microtasks)
 - **Phase 4**: 15% Complete (5/32 microtasks)
 
-**Total Project Progress**: 51% Complete (61/120 microtasks)
+**Total Project Progress**: 52% Complete (62/120 microtasks)
 
 ---
 
