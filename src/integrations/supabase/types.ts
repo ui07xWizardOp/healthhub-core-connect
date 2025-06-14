@@ -1999,7 +1999,7 @@ export type Database = {
           phone?: string | null
           profile_completed?: boolean | null
           profile_picture?: string | null
-          userid: number
+          userid?: number
           username: string
         }
         Update: {
