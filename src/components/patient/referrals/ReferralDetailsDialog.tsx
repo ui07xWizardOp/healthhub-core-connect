@@ -1,25 +1,40 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { PatientReferral, Doctor } from '@/types/patientManagement';
 import { format } from 'date-fns';
-import { ExternalLink, User } from 'lucide-react';
+import { ExternalLink, User, Calendar as CalendarIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface ReferralDetailsDialogProps {
   referral: PatientReferral;
   doctors: Doctor[];
   onClose: () => void;
+  onReferralUpdated: () => void;
 }
 
-const ReferralDetailsDialog: React.FC<ReferralDetailsDialogProps> = ({ referral, doctors, onClose }) => {
+const ReferralDetailsDialog: React.FC<ReferralDetailsDialogProps> = ({ referral, doctors, onClose, onReferralUpdated }) => {
   const { userProfile } = useAuth();
+  const [status, setStatus] = useState<PatientReferral['status']>(referral.status);
+  const [appointmentDate, setAppointmentDate] = useState<Date | undefined>(
+    referral.appointment_date ? new Date(referral.appointment_date) : undefined
+  );
+  const [isUpdating, setIsUpdating] = useState(false);
   
   const getDoctorName = (id: number | null) => {
     if (!id) return 'N/A';
@@ -30,6 +45,39 @@ const ReferralDetailsDialog: React.FC<ReferralDetailsDialogProps> = ({ referral,
   
   const referringDoctorName = getDoctorName(referral.referring_doctor_id);
   const referredToDoctorName = getDoctorName(referral.referred_to_doctor_id);
+
+  const isReferredToDoctor = userProfile?.doctorId === referral.referred_to_doctor_id;
+
+  const handleUpdateReferral = async () => {
+    if (!isReferredToDoctor) return;
+
+    if (status === 'scheduled' && !appointmentDate) {
+      toast.error('Please select an appointment date for scheduled referrals.');
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('patient_referrals')
+        .update({
+          status: status,
+          appointment_date: status === 'scheduled' && appointmentDate ? appointmentDate.toISOString() : null,
+        })
+        .eq('referral_id', referral.referral_id);
+
+      if (error) throw error;
+
+      toast.success('Referral updated successfully');
+      onReferralUpdated();
+      onClose();
+    } catch (error: any) {
+      console.error('Error updating referral:', error);
+      toast.error(error.message || 'Failed to update referral');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
@@ -98,6 +146,64 @@ const ReferralDetailsDialog: React.FC<ReferralDetailsDialogProps> = ({ referral,
             </div>
           )}
         </div>
+
+        {isReferredToDoctor && (
+          <div className="pt-4 mt-4 border-t">
+            <h4 className="font-semibold text-gray-800 mb-4">Update Referral</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select value={status} onValueChange={(value) => setStatus(value as PatientReferral['status'])}>
+                  <SelectTrigger id="status">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {status === 'scheduled' && (
+                <div className="space-y-2">
+                  <Label htmlFor="appointment-date">Appointment Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !appointmentDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {appointmentDate ? format(appointmentDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={appointmentDate}
+                        onSelect={setAppointmentDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <DialogFooter className="pt-6">
+          <Button variant="outline" onClick={onClose}>Close</Button>
+          {isReferredToDoctor && (
+            <Button onClick={handleUpdateReferral} disabled={isUpdating}>
+              {isUpdating ? 'Updating...' : 'Save Changes'}
+            </Button>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
