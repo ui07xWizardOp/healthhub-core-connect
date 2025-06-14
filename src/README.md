@@ -117,11 +117,11 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ---
 
 ## 📅 Phase 2: Patient & Doctor Experience (3-4 weeks)
-**Status**: 🟡 45% Complete | **Timeline**: Week 4-7
+**Status**: 🟡 54% Complete | **Timeline**: Week 4-7
 
-### 2.1 Patient Dashboard 🟡 30% COMPLETE
+### 2.1 Patient Dashboard 🟡 40% COMPLETE
 - ✅ **MT-2.1.1**: Create basic patient dashboard layout
-- 🟡 **MT-2.1.2**: Complete appointment booking interface (PARTIAL)
+- ✅ **MT-2.1.2**: Complete appointment booking interface
 - ⭕ **MT-2.1.3**: Build test results viewer component
 - ⭕ **MT-2.1.4**: Create prescription history display
 - ⭕ **MT-2.1.5**: Implement medication tracking system
@@ -139,10 +139,10 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 - ⭕ **MT-2.2.7**: Implement visit notes system
 - ⭕ **MT-2.2.8**: Create prescription templates
 
-### 2.3 Appointment System 🟡 40% COMPLETE
-- 🔄 **MT-2.3.1**: Create appointment calendar component (PARTIAL)
-- 🔄 **MT-2.3.2**: Implement doctor availability system (PARTIAL)
-- ⭕ **MT-2.3.3**: Build real-time slot booking
+### 2.3 Appointment System 🟡 60% COMPLETE
+- ✅ **MT-2.3.1**: Create appointment calendar component
+- ✅ **MT-2.3.2**: Implement doctor availability system
+- 🔄 **MT-2.3.3**: Build real-time slot booking (PARTIAL)
 - ⭕ **MT-2.3.4**: Add appointment notifications
 - ⭕ **MT-2.3.5**: Create reminder system
 - ⭕ **MT-2.3.6**: Build rescheduling functionality
@@ -189,13 +189,13 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ## 🎯 Current Priority Queue
 
 ### 🔥 **Immediate Next Tasks** (Week 4):
-1. **MT-2.1.2**: Complete appointment booking interface
+1. **MT-2.1.3**: Build test results viewer component
 
 ### ⚡ **High Priority** (Week 4-5):
-1. **MT-2.1.3**: Build test results viewer
-2. **MT-2.3.3**: Build real-time slot booking
-3. **MT-2.2.6**: Add patient search functionality
-4. **MT-3.1.1**: Create prescription validation system
+1. **MT-2.3.3**: Build real-time slot booking
+2. **MT-2.2.6**: Add patient search functionality
+3. **MT-3.1.1**: Create prescription validation system
+4. **MT-3.2.2**: Implement test ordering workflow
 
 ### 📌 **Medium Priority** (Week 5-6):
 1. **MT-3.3.2**: Implement batch management system
@@ -212,11 +212,11 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 
 ## 📊 Overall Progress
 - **Phase 1**: 100% Complete (40/40 microtasks)
-- **Phase 2**: 45% Complete (11/24 microtasks) 
+- **Phase 2**: 54% Complete (13/24 microtasks) 
 - **Phase 3**: 12.5% Complete (3/24 microtasks)
 - **Phase 4**: 15% Complete (5/32 microtasks)
 
-**Total Project Progress**: 49% Complete (59/120 microtasks)
+**Total Project Progress**: 51% Complete (61/120 microtasks)
 
 ---
 

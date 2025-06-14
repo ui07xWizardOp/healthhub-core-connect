@@ -6,9 +6,12 @@ import DoctorList from '@/components/appointments/DoctorList';
 import { Doctor } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import AppointmentCalendar from '@/components/appointments/AppointmentCalendar';
+import TimeSlotSelector from '@/components/appointments/TimeSlotSelector';
 
 const AppointmentBookingPage: React.FC = () => {
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     
     return (
         <div className="min-h-screen flex flex-col">
@@ -28,14 +31,28 @@ const AppointmentBookingPage: React.FC = () => {
                     {!selectedDoctor ? (
                         <DoctorList onSelectDoctor={setSelectedDoctor} />
                     ) : (
-                        <div className="max-w-4xl mx-auto">
+                        <div className="max-w-7xl mx-auto">
                           <Button variant="outline" onClick={() => setSelectedDoctor(null)} className="mb-8">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back to Doctors
                           </Button>
-                          <div className="text-center bg-white p-8 rounded-lg shadow-sm">
-                              <h2 className="text-2xl font-semibold">WIP: Doctor Availability</h2>
-                              <p className="mt-4 text-gray-600">The next step is to show the doctor's calendar and available time slots here to complete the booking.</p>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                            <div className="md:col-span-1">
+                                <AppointmentCalendar
+                                    doctor={selectedDoctor}
+                                    selectedDate={selectedDate}
+                                    onDateSelect={setSelectedDate}
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <TimeSlotSelector
+                                    doctorId={selectedDoctor.doctorid}
+                                    selectedDate={selectedDate}
+                                    refreshAppointments={() => {
+                                        // Future enhancement: could refetch a list of user's appointments
+                                    }}
+                                />
+                            </div>
                           </div>
                         </div>
                     )}
