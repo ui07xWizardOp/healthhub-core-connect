@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,12 +26,14 @@ import PatientSelector from './PatientSelector';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { MedicalRecord, NewMedicalRecord } from '@/types/patientManagement';
+import TreatmentPlanDetailsDialog from './TreatmentPlanDetailsDialog';
 
 const PatientTreatmentPlans: React.FC = () => {
   const { userProfile } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [viewingRecord, setViewingRecord] = useState<MedicalRecord | null>(null);
   const [newRecord, setNewRecord] = useState<Partial<NewMedicalRecord>>({
     record_type: 'treatment_plan',
     title: '',
@@ -173,7 +174,7 @@ const PatientTreatmentPlans: React.FC = () => {
                         {record.content.length > 100 ? `${record.content.substring(0, 100)}...` : record.content}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" onClick={() => setViewingRecord(record)}>
                           <ClipboardList className="h-4 w-4" />
                           <span className="sr-only">View</span>
                         </Button>
@@ -199,6 +200,13 @@ const PatientTreatmentPlans: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      {viewingRecord && (
+        <TreatmentPlanDetailsDialog
+          record={viewingRecord}
+          onClose={() => setViewingRecord(null)}
+        />
+      )}
 
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="sm:max-w-[600px]">
