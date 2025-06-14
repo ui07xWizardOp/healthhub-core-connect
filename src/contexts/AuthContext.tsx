@@ -81,37 +81,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
-      if (data && data.success) {
-        console.log('User profile data loaded successfully:', data);
-        
-        const roles: string[] = data.roles || [];
-        const isCustomer = roles.includes('Customer');
-        const isDoctor = roles.includes('Doctor');
-        const isStaff = roles.includes('Staff') || roles.includes('Admin');
+      // Perform a type check to ensure data is a valid object before accessing properties
+      if (data && typeof data === 'object' && !Array.isArray(data)) {
+        const profileData = data as any; // Use 'any' after type check for safe property access
 
-        const profile: UserProfile = {
-          userid: data.userid,
-          firstname: data.firstname,
-          lastname: data.lastname,
-          email: data.email,
-          phone: data.phone,
-          profile_picture: data.profile_picture,
-          profile_completed: data.profile_completed,
-          roles: roles,
-          isCustomer: isCustomer,
-          isDoctor: isDoctor,
-          isStaff: isStaff,
-          // Map fields from DB to UserProfile type
-          dateOfBirth: data.dateofbirth, 
-          gender: data.gender,
-          bloodGroup: data.bloodgroup,
-          emergencyContact: data.emergencycontact,
-          preferences: data.preferences,
-        };
-        
-        setUserProfile(profile);
+        if (profileData.success) {
+          console.log('User profile data loaded successfully:', profileData);
+          
+          const roles: string[] = profileData.roles || [];
+          const isCustomer = roles.includes('Customer');
+          const isDoctor = roles.includes('Doctor');
+          const isStaff = roles.includes('Staff') || roles.includes('Admin');
+
+          const profile: UserProfile = {
+            userid: profileData.userid,
+            firstname: profileData.firstname,
+            lastname: profileData.lastname,
+            email: profileData.email,
+            phone: profileData.phone,
+            profile_picture: profileData.profile_picture,
+            profile_completed: profileData.profile_completed,
+            roles: roles,
+            isCustomer: isCustomer,
+            isDoctor: isDoctor,
+            isStaff: isStaff,
+            // Map fields from DB to UserProfile type
+            dateOfBirth: profileData.dateofbirth, 
+            gender: profileData.gender,
+            bloodGroup: profileData.bloodgroup,
+            emergencyContact: profileData.emergencycontact,
+            preferences: profileData.preferences,
+          };
+          
+          setUserProfile(profile);
+        } else {
+          console.error('Failed to fetch user profile:', profileData.message || 'No data returned from RPC.');
+          setUserProfile(null);
+        }
       } else {
-        console.error('Failed to fetch user profile or invalid data format:', data?.message || 'No data returned from RPC.');
+        console.error('Failed to fetch user profile or invalid data format: RPC response is not an object.');
         setUserProfile(null);
       }
     } catch (error) {
