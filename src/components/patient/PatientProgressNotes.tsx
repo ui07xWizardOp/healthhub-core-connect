@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Plus } from 'lucide-react';
 import PatientSelector from './PatientSelector';
 import { MedicalRecord } from '@/types/patientManagement';
-import ProgressNoteDetailsDialog from './ProgressNoteDetailsDialog';
+import ProgressNoteDetailsDialog from './progress-notes/ProgressNoteDetailsDialog';
 import CreateProgressNoteDialog from './progress-notes/CreateProgressNoteDialog';
 import ProgressNotesTable from './progress-notes/ProgressNotesTable';
 import ProgressNotesEmptyState from './progress-notes/ProgressNotesEmptyState';

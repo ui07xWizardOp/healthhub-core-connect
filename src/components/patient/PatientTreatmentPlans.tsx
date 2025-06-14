@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Plus } from 'lucide-react';
 import PatientSelector from './PatientSelector';
 import { MedicalRecord } from '@/types/patientManagement';
-import TreatmentPlanDetailsDialog from './TreatmentPlanDetailsDialog';
+import TreatmentPlanDetailsDialog from './treatment-plans/TreatmentPlanDetailsDialog';
 import CreateTreatmentPlanDialog from './treatment-plans/CreateTreatmentPlanDialog';
 import TreatmentPlansTable from './treatment-plans/TreatmentPlansTable';
 import TreatmentPlansEmptyState from './treatment-plans/TreatmentPlansEmptyState';
