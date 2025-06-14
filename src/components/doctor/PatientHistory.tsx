@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,7 +46,7 @@ const PatientHistory: React.FC = () => {
     queryFn: async () => {
       if (!userProfile?.doctorId) return [];
       
-      const { data, error } = await supabase.rpc('get_doctor_patients', {
+      const { data, error } = await supabase.rpc('get_doctor_patients' as any, {
         p_doctor_id: userProfile.doctorId,
       });
 
@@ -54,7 +55,7 @@ const PatientHistory: React.FC = () => {
         throw error;
       }
       
-      return (data as Patient[]) || [];
+      return (data as unknown as Patient[]) || [];
     },
     enabled: !!userProfile?.doctorId,
   });
