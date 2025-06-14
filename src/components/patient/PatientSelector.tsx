@@ -12,14 +12,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-
-interface Patient {
-  customerid: number;
-  firstname: string;
-  lastname: string;
-  gender?: string;
-  dateofbirth?: string;
-}
+import { Patient } from '@/types/patient';
 
 interface PatientSelectorProps {
   onPatientSelect: (patientId: number | null) => void;
@@ -29,52 +22,22 @@ const PatientSelector: React.FC<PatientSelectorProps> = ({ onPatientSelect }) =>
   const { userProfile } = useAuth();
   const [selectedPatientId, setSelectedPatientId] = useState<string>('');
 
-  // Fetch all patients for this doctor
+  // Fetch all patients for this doctor using the optimized RPC function
   const { data: patients, isLoading } = useQuery({
     queryKey: ['doctor-patients', userProfile?.doctorId],
     queryFn: async () => {
-      // First get appointments with this doctor to find all patients
-      const { data: appointmentData, error: appointmentError } = await supabase
-        .from('appointments')
-        .select(`
-          customerid
-        `)
-        .eq('doctorid', userProfile?.doctorId)
-        .order('appointmentdate', { ascending: false });
+      if (!userProfile?.doctorId) return [];
       
-      if (appointmentError) throw appointmentError;
+      const { data, error } = await supabase.rpc('get_doctor_patients' as any, {
+        p_doctor_id: userProfile.doctorId,
+      });
+
+      if (error) {
+        console.error('Error fetching doctor patients:', error);
+        throw error;
+      }
       
-      // Get unique customer IDs
-      const uniqueCustomerIds = [...new Set(appointmentData?.map(a => a.customerid))];
-      
-      if (uniqueCustomerIds.length === 0) return [];
-      
-      // Get customer details
-      const { data: customerData, error: customerError } = await supabase
-        .from('users')
-        .select(`
-          userid,
-          firstname,
-          lastname,
-          customerprofiles:customerprofiles(
-            dateofbirth,
-            gender
-          )
-        `)
-        .in('userid', uniqueCustomerIds);
-      
-      if (customerError) throw customerError;
-      
-      // Map data to get patient information
-      return customerData?.map(customer => {
-        return {
-          customerid: customer.userid,
-          firstname: customer.firstname,
-          lastname: customer.lastname,
-          gender: customer.customerprofiles?.[0]?.gender,
-          dateofbirth: customer.customerprofiles?.[0]?.dateofbirth,
-        };
-      }) || [];
+      return (data as unknown as Patient[]) || [];
     },
     enabled: !!userProfile?.doctorId
   });
@@ -95,7 +58,7 @@ const PatientSelector: React.FC<PatientSelectorProps> = ({ onPatientSelect }) =>
         disabled={isLoading}
       >
         <SelectTrigger className="w-full" id="patient-select">
-          <SelectValue placeholder="Select a patient" />
+          <SelectValue placeholder={isLoading ? "Loading patients..." : "Select a patient"} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
@@ -105,7 +68,7 @@ const PatientSelector: React.FC<PatientSelectorProps> = ({ onPatientSelect }) =>
                 {patient.firstname} {patient.lastname}
               </SelectItem>
             ))}
-            {patients?.length === 0 && (
+            {!isLoading && patients?.length === 0 && (
               <SelectItem value="no-patients" disabled>
                 No patients found
               </SelectItem>
