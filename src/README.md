@@ -121,7 +121,7 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 
 ### 2.1 Patient Dashboard 🟡 30% COMPLETE
 - ✅ **MT-2.1.1**: Create basic patient dashboard layout
-- 🔄 **MT-2.1.2**: Complete appointment booking interface
+- 🟡 **MT-2.1.2**: Complete appointment booking interface (PARTIAL)
 - ⭕ **MT-2.1.3**: Build test results viewer component
 - ⭕ **MT-2.1.4**: Create prescription history display
 - ⭕ **MT-2.1.5**: Implement medication tracking system

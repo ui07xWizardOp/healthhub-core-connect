@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,12 +24,12 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import DoctorPortal from "./pages/DoctorPortal";
 import NewPrescriptionPage from "./pages/NewPrescription";
-import AppointmentBooking from './pages/AppointmentBooking';
 import PatientManagement from "./pages/PatientManagement";
 import Services from "./pages/Services";
 import LabTests from "./pages/LabTests";
 import LabTestBooking from "./pages/LabTestBooking";
 import HealthPackages from "./pages/HealthPackages";
+import AppointmentBookingPage from "./pages/AppointmentBookingPage";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -145,7 +144,7 @@ const App = () => (
                 <Route path="/contact" element={<NotFound />} />
                 
                 {/* Add the new route */}
-                <Route path="/appointments" element={<AppointmentBooking />} />
+                <Route path="/appointments" element={<AppointmentBookingPage />} />
                 
                 {/* Catch all route */}
                 <Route path="*" element={<NotFound />} />
