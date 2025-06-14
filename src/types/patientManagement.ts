@@ -1,4 +1,11 @@
 
+export interface Doctor {
+  doctorid: number;
+  firstname: string;
+  lastname: string;
+  specialization: string | null;
+}
+
 export interface MedicalRecord {
   record_id: string;
   patient_id: number;
