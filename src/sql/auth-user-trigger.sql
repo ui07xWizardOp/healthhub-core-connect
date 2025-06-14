@@ -19,7 +19,8 @@ BEGIN
     firstname, 
     lastname, 
     datecreated,
-    isactive
+    isactive,
+    profile_completed
   ) VALUES (
     new.email, -- Use email as username initially
     'supabase_auth', -- Placeholder since actual password is managed by Supabase Auth
@@ -28,7 +29,8 @@ BEGIN
     new.raw_user_meta_data->>'first_name',
     new.raw_user_meta_data->>'last_name',
     now(),
-    TRUE
+    TRUE,
+    TRUE -- Mark profile as completed for demo users
   ) RETURNING userid INTO new_user_id;
   
   -- Get role ID
@@ -39,7 +41,7 @@ BEGIN
     INSERT INTO public.userrolemapping (userid, roleid)
     VALUES (new_user_id, role_id);
     
-    -- Also create a customer profile record if the role is Customer
+    -- Create customer profile record if the role is Customer
     IF role_name = 'Customer' THEN
       INSERT INTO public.customerprofiles (customerid)
       VALUES (new_user_id);

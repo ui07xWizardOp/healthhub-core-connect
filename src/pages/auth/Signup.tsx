@@ -64,6 +64,8 @@ const Signup: React.FC = () => {
   const onSubmit = async (values: SignupFormValues) => {
     setIsLoading(true);
     try {
+      console.log('Attempting to sign up user with role:', values.role);
+      
       const userData = {
         first_name: values.firstName,
         last_name: values.lastName,
@@ -74,14 +76,33 @@ const Signup: React.FC = () => {
       const { data, error } = await signUp(values.email, values.password, userData);
       
       if (error) {
-        toast.error(error.message || 'Failed to sign up');
+        console.error('Signup error:', error);
+        
+        // Handle specific error cases
+        if (error.message?.includes('User already registered')) {
+          toast.error('An account with this email already exists. Please sign in instead.');
+        } else if (error.message?.includes('Password')) {
+          toast.error('Password must be at least 6 characters long.');
+        } else if (error.message?.includes('Email')) {
+          toast.error('Please enter a valid email address.');
+        } else {
+          toast.error(error.message || 'Failed to create account. Please try again.');
+        }
       } else {
-        toast.success('Successfully signed up! Please check your email for verification.');
-        // Redirect to profile completion page
-        navigate('/complete-profile');
+        console.log('Signup successful:', data);
+        toast.success('Account created successfully! Please check your email to verify your account.');
+        
+        // For demo purposes, redirect immediately to dashboard
+        // In production, you'd wait for email verification
+        if (values.role === 'Customer') {
+          navigate('/complete-profile');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error: any) {
-      toast.error(error.message || 'An unexpected error occurred');
+      console.error('Unexpected signup error:', error);
+      toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -272,10 +293,10 @@ const Signup: React.FC = () => {
             >
               {isLoading ? (
                 <>
-                  <Loader className="mr-2 h-4 w-4 animate-spin" /> Please wait
+                  <Loader className="mr-2 h-4 w-4 animate-spin" /> Creating account...
                 </>
               ) : (
-                'Sign Up'
+                'Create Account'
               )}
             </Button>
           </form>

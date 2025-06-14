@@ -10,34 +10,43 @@ import DashboardSelector from '@/components/dashboard/DashboardSelector';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const Dashboard: React.FC = () => {
-  const { userProfile, isAdmin, isStaff, isDoctor, isCustomer, hasRole } = useAuth();
+  const { userProfile, isAdmin, isStaff, isDoctor, isCustomer, hasRole, loading } = useAuth();
+
+  console.log('Dashboard - userProfile:', userProfile);
+  console.log('Dashboard - isAdmin():', isAdmin());
+  console.log('Dashboard - roles:', userProfile?.roles);
 
   const renderDashboardByRole = () => {
     // Admin gets their special dashboard selector
     if (isAdmin()) {
+      console.log('Rendering DashboardSelector for Admin');
       return <DashboardSelector />;
     }
 
     // Staff dashboard for staff users and doctors (as they are also staff)
     if (isStaff() || isDoctor()) {
+      console.log('Rendering StaffDashboard for Staff/Doctor');
       return <StaffDashboard />;
     }
 
     // Lab technician gets their specialized view
     if (hasRole('LabTechnician')) {
+      console.log('Rendering LabTechnicianDashboard');
       return <LabTechnicianDashboard />;
     }
 
     // Customers get the customer dashboard
     if (isCustomer()) {
+      console.log('Rendering CustomerDashboard');
       return <CustomerDashboard />;
     }
 
     // Fallback to the customer dashboard for unknown roles
+    console.log('Rendering fallback CustomerDashboard');
     return <CustomerDashboard />;
   };
 
-  if (!userProfile) {
+  if (loading) {
     return (
       <DashboardLayout>
         <div className="p-6 space-y-6">
@@ -58,6 +67,17 @@ const Dashboard: React.FC = () => {
             <Skeleton className="h-[250px] rounded-lg" />
             <Skeleton className="h-[250px] rounded-lg" />
           </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 text-center">
+          <h2 className="text-xl font-semibold text-gray-700">Loading your profile...</h2>
+          <p className="text-gray-500 mt-2">Please wait while we set up your dashboard.</p>
         </div>
       </DashboardLayout>
     );

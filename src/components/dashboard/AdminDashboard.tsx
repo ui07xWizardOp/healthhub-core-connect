@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend, BarChart, Bar } from 'recharts';
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 
 const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState({
@@ -31,6 +32,10 @@ const AdminDashboard: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { userProfile } = useAuth();
+
+  console.log('AdminDashboard - userProfile:', userProfile);
+  console.log('AdminDashboard - user roles:', userProfile?.roles);
 
   // Sample data for charts
   const salesData = [
@@ -57,6 +62,8 @@ const AdminDashboard: React.FC = () => {
     async function fetchDashboardData() {
       setLoading(true);
       try {
+        console.log('Fetching admin dashboard data...');
+        
         // Use Promise.all to fetch all data in parallel
         const [
           medicineResult,
@@ -81,12 +88,30 @@ const AdminDashboard: React.FC = () => {
         ]);
 
         // Check for errors
-        if (medicineResult.error) throw medicineResult.error;
-        if (testResult.error) throw testResult.error;
-        if (customerResult.error) throw customerResult.error;
-        if (orderResult.error) throw orderResult.error;
-        if (appointmentResult.error) throw appointmentResult.error;
-        if (salesResult.error) throw salesResult.error;
+        if (medicineResult.error) {
+          console.error('Medicine fetch error:', medicineResult.error);
+          throw medicineResult.error;
+        }
+        if (testResult.error) {
+          console.error('Test fetch error:', testResult.error);
+          throw testResult.error;
+        }
+        if (customerResult.error) {
+          console.error('Customer fetch error:', customerResult.error);
+          throw customerResult.error;
+        }
+        if (orderResult.error) {
+          console.error('Order fetch error:', orderResult.error);
+          throw orderResult.error;
+        }
+        if (appointmentResult.error) {
+          console.error('Appointment fetch error:', appointmentResult.error);
+          throw appointmentResult.error;
+        }
+        if (salesResult.error) {
+          console.error('Sales fetch error:', salesResult.error);
+          throw salesResult.error;
+        }
 
         // Calculate total revenue
         const totalRevenue = salesResult.data?.reduce(
@@ -94,14 +119,17 @@ const AdminDashboard: React.FC = () => {
           0
         ) || 0;
 
-        setStats({
+        const newStats = {
           totalMedicines: medicineResult.count || 0,
           totalTests: testResult.count || 0,
           totalCustomers: customerResult.count || 0,
           totalOrders: orderResult.count || 0,
           totalAppointments: appointmentResult.count || 0,
           totalRevenue: totalRevenue
-        });
+        };
+
+        console.log('Admin dashboard stats loaded:', newStats);
+        setStats(newStats);
       } catch (error: any) {
         console.error('Error fetching dashboard data:', error.message);
         toast({
@@ -120,7 +148,10 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <div>
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <p className="text-gray-600 mt-1">Welcome back, {userProfile?.firstname} {userProfile?.lastname}</p>
+        </div>
         <div className="flex items-center gap-4">
           <Bell className="h-5 w-5 text-gray-500" />
           <Settings className="h-5 w-5 text-gray-500" />

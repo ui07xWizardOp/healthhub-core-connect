@@ -72,56 +72,105 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Function to fetch user profile data
   const fetchUserProfile = async (userId: string) => {
     try {
-      // Use the get_user_profile_details function for enhanced profile details
-      const { data, error } = await supabase.rpc('get_user_profile_details', { p_user_id: userId });
+      console.log('Fetching user profile for:', userId);
       
-      if (error) {
-        console.error('Error fetching user profile:', error);
+      // Get the user email from auth
+      const { data: authUser } = await supabase.auth.getUser();
+      if (!authUser.user?.email) {
+        console.error('No email found for authenticated user');
         setUserProfile(null);
         return;
       }
-      
-      // Perform a type check to ensure data is a valid object before accessing properties
-      if (data && typeof data === 'object' && !Array.isArray(data)) {
-        const profileData = data as any; // Use 'any' after type check for safe property access
 
-        if (profileData.success) {
-          console.log('User profile data loaded successfully:', profileData);
-          
-          const roles: string[] = profileData.roles || [];
-          const isCustomer = roles.includes('Customer');
-          const isDoctor = roles.includes('Doctor');
-          const isStaff = roles.includes('Staff') || roles.includes('Admin');
+      // Get user details from our users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', authUser.user.email)
+        .single();
 
-          const profile: UserProfile = {
-            userid: profileData.userid,
-            firstname: profileData.firstname,
-            lastname: profileData.lastname,
-            email: profileData.email,
-            phone: profileData.phone,
-            profile_picture: profileData.profile_picture,
-            profile_completed: profileData.profile_completed,
-            roles: roles,
-            isCustomer: isCustomer,
-            isDoctor: isDoctor,
-            isStaff: isStaff,
-            // Map fields from DB to UserProfile type
-            dateOfBirth: profileData.dateofbirth, 
-            gender: profileData.gender,
-            bloodGroup: profileData.bloodgroup,
-            emergencyContact: profileData.emergencycontact,
-            preferences: profileData.preferences,
-          };
-          
-          setUserProfile(profile);
-        } else {
-          console.error('Failed to fetch user profile:', profileData.message || 'No data returned from RPC.');
-          setUserProfile(null);
-        }
-      } else {
-        console.error('Failed to fetch user profile or invalid data format: RPC response is not an object.');
+      if (userError) {
+        console.error('Error fetching user data:', userError);
         setUserProfile(null);
+        return;
       }
+
+      if (!userData) {
+        console.error('No user data found');
+        setUserProfile(null);
+        return;
+      }
+
+      // Get user roles
+      const { data: roleData, error: roleError } = await supabase
+        .from('userrolemapping')
+        .select(`
+          userroles (
+            rolename
+          )
+        `)
+        .eq('userid', userData.userid);
+
+      if (roleError) {
+        console.error('Error fetching user roles:', roleError);
+      }
+
+      const roles = roleData?.map(item => item.userroles?.rolename).filter(Boolean) || [];
+      console.log('User roles:', roles);
+
+      // Check if user is customer and get customer profile
+      let customerData = null;
+      if (roles.includes('Customer')) {
+        const { data: customer, error: customerError } = await supabase
+          .from('customerprofiles')
+          .select('*')
+          .eq('customerid', userData.userid)
+          .single();
+
+        if (!customerError && customer) {
+          customerData = customer;
+        }
+      }
+
+      // Check if user is doctor and get doctor profile
+      let doctorData = null;
+      if (roles.includes('Doctor') || roles.includes('Admin') || roles.includes('Staff')) {
+        const { data: doctor, error: doctorError } = await supabase
+          .from('doctors')
+          .select('*')
+          .eq('email', authUser.user.email)
+          .single();
+
+        if (!doctorError && doctor) {
+          doctorData = doctor;
+        }
+      }
+
+      const profile: UserProfile = {
+        userid: userData.userid,
+        firstname: userData.firstname,
+        lastname: userData.lastname,
+        email: userData.email,
+        phone: userData.phone,
+        profile_picture: userData.profile_picture,
+        profile_completed: userData.profile_completed,
+        roles: roles,
+        isCustomer: roles.includes('Customer'),
+        isDoctor: !!doctorData || roles.includes('Doctor'),
+        isStaff: roles.includes('Staff') || roles.includes('Admin'),
+        doctorId: doctorData?.doctorid,
+        specialization: doctorData?.specialization,
+        qualification: doctorData?.qualification,
+        customerId: customerData?.customerid,
+        dateOfBirth: customerData?.dateofbirth,
+        gender: customerData?.gender,
+        bloodGroup: customerData?.bloodgroup,
+        emergencyContact: customerData?.emergencycontact,
+        preferences: customerData?.preferences || {},
+      };
+
+      console.log('Setting user profile:', profile);
+      setUserProfile(profile);
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
       setUserProfile(null);
@@ -132,7 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
-        console.log('Auth state changed:', event);
+        console.log('Auth state changed:', event, newSession?.user?.email);
         setSession(newSession);
         setUser(newSession?.user ?? null);
         
@@ -197,6 +246,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
         options: {
           data: userData,
+          emailRedirectTo: `${window.location.origin}/`
         }
       });
       return { data, error };
@@ -252,11 +302,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const isDoctor = (): boolean => {
-    return !!userProfile?.isDoctor;
+    return !!userProfile?.isDoctor || hasRole('Doctor');
   };
 
   const isCustomer = (): boolean => {
-    return !!userProfile?.isCustomer;
+    return !!userProfile?.isCustomer || hasRole('Customer');
   };
 
   const value = {
