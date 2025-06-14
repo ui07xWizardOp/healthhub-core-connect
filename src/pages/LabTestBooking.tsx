@@ -1,15 +1,81 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useLabTestCart } from '@/contexts/LabTestCartContext';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const LabTestBooking: React.FC = () => {
-  const { cartItems, removeFromCart, cartCount, totalPrice } = useLabTestCart();
+  const { cartItems, removeFromCart, clearCart, cartCount, totalPrice } = useLabTestCart();
+  const { profile } = useAuth();
+  const navigate = useNavigate();
+  const [isBooking, setIsBooking] = useState(false);
+
+  const handleProceedToBook = async () => {
+    if (!profile) {
+      toast.error("You must be logged in to book tests.", {
+        description: "Please log in or create an account to continue.",
+      });
+      navigate('/login');
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      toast.error("Your cart is empty.");
+      return;
+    }
+
+    setIsBooking(true);
+
+    try {
+      const { data: labOrder, error: orderError } = await supabase
+        .from('laborders')
+        .insert({
+          customerid: profile.userid,
+          totalamount: totalPrice,
+          paymentmethod: 'Online', // Placeholder
+          status: 'Ordered',
+          createdby: profile.userid,
+          resultdeliverymethod: 'Email' // Placeholder
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      const orderItems = cartItems.map(item => ({
+        orderid: labOrder.orderid,
+        testid: item.type === 'test' ? item.testid : null,
+        panelid: item.type === 'panel' ? item.panelid : null,
+        price: item.price || 0,
+        status: 'Pending'
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('laborderitems')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+      
+      clearCart();
+
+      toast.success("Your lab test order has been placed successfully!");
+      navigate('/dashboard');
+    
+    } catch (error) {
+      console.error("Error booking lab tests:", error);
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+      toast.error("Booking Failed", { description: errorMessage });
+    } finally {
+      setIsBooking(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -73,7 +139,9 @@ const LabTestBooking: React.FC = () => {
                     </div>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full" size="lg">Proceed to Book</Button>
+                    <Button className="w-full" size="lg" onClick={handleProceedToBook} disabled={isBooking || cartCount === 0}>
+                      {isBooking ? 'Processing...' : 'Proceed to Book'}
+                    </Button>
                   </CardFooter>
                 </Card>
               </div>

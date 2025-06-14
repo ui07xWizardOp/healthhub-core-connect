@@ -166,7 +166,7 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 
 ### 3.2 Laboratory System 🔴 25% COMPLETE
 - 🔄 **MT-3.2.1**: Create basic lab test forms (PARTIAL)
-- 🔄 **MT-3.2.2**: Implement test ordering workflow (PARTIAL)
+- 🟡 **MT-3.2.2**: Implement test ordering workflow (PARTIAL)
 - ⭕ **MT-3.2.3**: Build sample collection tracking
 - ⭕ **MT-3.2.4**: Create result entry interface
 - ⭕ **MT-3.2.5**: Implement result verification system
