@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -35,6 +34,7 @@ const ReferralDetailsDialog: React.FC<ReferralDetailsDialogProps> = ({ referral,
     referral.appointment_date ? new Date(referral.appointment_date) : undefined
   );
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   
   const getDoctorName = (id: number | null) => {
     if (!id) return 'N/A';
@@ -47,6 +47,7 @@ const ReferralDetailsDialog: React.FC<ReferralDetailsDialogProps> = ({ referral,
   const referredToDoctorName = getDoctorName(referral.referred_to_doctor_id);
 
   const isReferredToDoctor = userProfile?.doctorId === referral.referred_to_doctor_id;
+  const isReferringDoctor = userProfile?.doctorId === referral.referring_doctor_id;
 
   const handleUpdateReferral = async () => {
     if (!isReferredToDoctor) return;
@@ -76,6 +77,29 @@ const ReferralDetailsDialog: React.FC<ReferralDetailsDialogProps> = ({ referral,
       toast.error(error.message || 'Failed to update referral');
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleCancelReferral = async () => {
+    if (!isReferringDoctor || referral.status !== 'pending') return;
+
+    setIsCancelling(true);
+    try {
+      const { error } = await supabase
+        .from('patient_referrals')
+        .update({ status: 'cancelled' })
+        .eq('referral_id', referral.referral_id);
+
+      if (error) throw error;
+
+      toast.success('Referral cancelled successfully');
+      onReferralUpdated();
+      onClose();
+    } catch (error: any) {
+      console.error('Error cancelling referral:', error);
+      toast.error(error.message || 'Failed to cancel referral');
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -201,6 +225,11 @@ const ReferralDetailsDialog: React.FC<ReferralDetailsDialogProps> = ({ referral,
           {isReferredToDoctor && (
             <Button onClick={handleUpdateReferral} disabled={isUpdating}>
               {isUpdating ? 'Updating...' : 'Save Changes'}
+            </Button>
+          )}
+          {isReferringDoctor && referral.status === 'pending' && (
+            <Button variant="destructive" onClick={handleCancelReferral} disabled={isCancelling}>
+              {isCancelling ? 'Cancelling...' : 'Cancel Referral'}
             </Button>
           )}
         </DialogFooter>
