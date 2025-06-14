@@ -48,29 +48,29 @@ const ServicesSection: React.FC = () => {
             icon={<CalendarIcon size={24} />}
             title="Book a Checkup"
             description="Schedule appointments with our experienced doctors. Check available slots and book your consultation."
-            linkTo="/signup"
+            linkTo="/appointments"
             buttonText="Book Now"
           />
           <ServiceCard
             icon={<TestTubeIcon size={24} />}
             title="Lab Tests"
             description="Browse our catalog of diagnostic tests with transparent pricing. Book your test with just a few clicks."
-            linkTo="/signup"
+            linkTo="/lab-tests"
             buttonText="View Tests"
           />
           <ServiceCard
             icon={<PillIcon size={24} />}
             title="Pharmacy"
             description="Order prescribed medications and have them delivered to your doorstep or pick up at your convenience."
-            linkTo="/signup"
+            linkTo="/pharmacy"
             buttonText="Explore"
           />
           <ServiceCard
             icon={<ClipboardListIcon size={24} />}
             title="Health Records"
             description="Access your medical history, test results, and prescriptions securely from anywhere."
-            linkTo="/signup"
-            buttonText="Learn More"
+            linkTo="/dashboard"
+            buttonText="Access Records"
           />
         </div>
       </div>
