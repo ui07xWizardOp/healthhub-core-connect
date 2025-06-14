@@ -182,6 +182,14 @@ export interface LabTest {
   isactive?: boolean | null;
 }
 
+export interface TestPanel {
+  panelid: number;
+  panelname: string;
+  description?: string | null;
+  price?: number | null;
+  isactive?: boolean | null;
+}
+
 export interface AppointmentNotification {
   notification_id: string;
   appointment_id: number;
