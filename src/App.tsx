@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,6 +30,7 @@ import PatientManagement from "./pages/PatientManagement";
 import Services from "./pages/Services";
 import LabTests from "./pages/LabTests";
 import LabTestBooking from "./pages/LabTestBooking";
+import HealthPackages from "./pages/HealthPackages";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -139,6 +141,7 @@ const App = () => (
                 <Route path="/doctors" element={<NotFound />} />
                 <Route path="/lab-tests" element={<LabTests />} />
                 <Route path="/lab-tests/book" element={<LabTestBooking />} />
+                <Route path="/health-packages" element={<HealthPackages />} />
                 <Route path="/contact" element={<NotFound />} />
                 
                 {/* Add the new route */}

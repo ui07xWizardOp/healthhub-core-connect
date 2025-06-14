@@ -1,12 +1,14 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { LabTest } from '@/types/supabase';
+import { LabTest, TestPanel } from '@/types/supabase';
 import { toast } from 'sonner';
 
+export type CartItem = (LabTest & { type: 'test' }) | (TestPanel & { type: 'panel' });
+
 interface LabTestCartContextType {
-  cartItems: LabTest[];
-  addToCart: (test: LabTest) => void;
-  removeFromCart: (testId: number) => void;
+  cartItems: CartItem[];
+  addToCart: (item: CartItem) => void;
+  removeFromCart: (itemId: number, itemType: 'test' | 'panel') => void;
   clearCart: () => void;
   cartCount: number;
   totalPrice: number;
@@ -15,31 +17,61 @@ interface LabTestCartContextType {
 const LabTestCartContext = createContext<LabTestCartContextType | undefined>(undefined);
 
 export const LabTestCartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [cartItems, setCartItems] = useState<LabTest[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const addToCart = (test: LabTest) => {
+  const addToCart = (item: CartItem) => {
     setCartItems((prevItems) => {
-      if (prevItems.find((item) => item.testid === test.testid)) {
-        toast.info(`${test.testname} is already in your cart.`);
+      const isPresent = prevItems.some((i) => {
+        if (i.type === 'test' && item.type === 'test') {
+          return i.testid === item.testid;
+        }
+        if (i.type === 'panel' && item.type === 'panel') {
+          return i.panelid === item.panelid;
+        }
+        return false;
+      });
+
+      const name = item.type === 'test' ? item.testname : item.panelname;
+
+      if (isPresent) {
+        toast.info(`${name} is already in your cart.`);
         return prevItems;
       }
-      toast.success(`${test.testname} added to cart.`);
-      return [...prevItems, test];
+      toast.success(`${name} added to cart.`);
+      return [...prevItems, item];
     });
   };
 
-  const removeFromCart = (testId: number) => {
+  const removeFromCart = (itemId: number, itemType: 'test' | 'panel') => {
     setCartItems((prevItems) => {
-      const newItems = prevItems.filter((item) => item.testid !== testId);
-      if (newItems.length < prevItems.length) {
-        toast.success(`Test removed from cart.`);
+      const itemToRemove = prevItems.find(item => {
+        if (item.type === itemType) {
+          if (itemType === 'test' && item.testid === itemId) return true;
+          if (itemType === 'panel' && item.panelid === itemId) return true;
+        }
+        return false;
+      });
+
+      if (itemToRemove) {
+        const name = itemToRemove.type === 'test' ? itemToRemove.testname : itemToRemove.panelname;
+        toast.success(`${name} removed from cart.`);
       }
-      return newItems;
+
+      return prevItems.filter((item) => {
+        if (item.type === 'test' && itemType === 'test') {
+          return item.testid !== itemId;
+        }
+        if (item.type === 'panel' && itemType === 'panel') {
+          return item.panelid !== itemId;
+        }
+        return true;
+      });
     });
   };
 
   const clearCart = () => {
     setCartItems([]);
+    toast.info("Cart cleared.");
   };
 
   const cartCount = cartItems.length;

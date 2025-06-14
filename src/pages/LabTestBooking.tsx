@@ -32,21 +32,27 @@ const LabTestBooking: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-4">
-                {cartItems.map((test) => (
-                  <Card key={test.testid} className="flex items-center justify-between p-4">
-                    <div>
-                      <h3 className="font-semibold">{test.testname}</h3>
-                      <p className="text-sm text-gray-500">{test.description || 'No description available.'}</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <p className="font-semibold text-lg">₹{test.price?.toFixed(2)}</p>
-                      <Button variant="ghost" size="icon" onClick={() => removeFromCart(test.testid)}>
-                        <Trash2 className="h-5 w-5 text-red-500" />
-                        <span className="sr-only">Remove test</span>
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
+                {cartItems.map((item) => {
+                  const id = item.type === 'test' ? item.testid : item.panelid;
+                  const name = item.type === 'test' ? item.testname : item.panelname;
+                  const description = item.description || 'No description available.';
+
+                  return (
+                    <Card key={`${item.type}-${id}`} className="flex items-center justify-between p-4">
+                      <div>
+                        <h3 className="font-semibold">{name}</h3>
+                        <p className="text-sm text-gray-500">{description}</p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <p className="font-semibold text-lg">₹{item.price?.toFixed(2)}</p>
+                        <Button variant="ghost" size="icon" onClick={() => removeFromCart(id, item.type)}>
+                          <Trash2 className="h-5 w-5 text-red-500" />
+                          <span className="sr-only">Remove item</span>
+                        </Button>
+                      </div>
+                    </Card>
+                  );
+                })}
               </div>
 
               <div className="lg:col-span-1">
