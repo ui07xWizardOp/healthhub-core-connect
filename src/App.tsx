@@ -27,6 +27,7 @@ import NewPrescriptionPage from "./pages/NewPrescription";
 import AppointmentBooking from './pages/AppointmentBooking';
 import PatientManagement from "./pages/PatientManagement";
 import Services from "./pages/Services";
+import LabTests from "./pages/LabTests";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -134,7 +135,7 @@ const App = () => (
               {/* Placeholders - will be protected in the future */}
               <Route path="/services" element={<Services />} />
               <Route path="/doctors" element={<NotFound />} />
-              <Route path="/lab-tests" element={<NotFound />} />
+              <Route path="/lab-tests" element={<LabTests />} />
               <Route path="/contact" element={<NotFound />} />
               
               {/* Add the new route */}
