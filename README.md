@@ -152,7 +152,7 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ---
 
 ## 🏪 Phase 3: Staff Operations & Administration (3-4 weeks)
-**Status**: 🔴 10% Complete | **Timeline**: Week 8-11
+**Status**: 🔴 12.5% Complete | **Timeline**: Week 8-11
 
 ### 3.1 Pharmacy System 🔴 5% COMPLETE
 - ⭕ **MT-3.1.1**: Create prescription validation system
@@ -164,9 +164,9 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 - ⭕ **MT-3.1.7**: Add insurance verification
 - ⭕ **MT-3.1.8**: Create refill management system
 
-### 3.2 Laboratory System 🔴 10% COMPLETE
+### 3.2 Laboratory System 🔴 25% COMPLETE
 - 🔄 **MT-3.2.1**: Create basic lab test forms (PARTIAL)
-- ⭕ **MT-3.2.2**: Implement test ordering workflow
+- 🔄 **MT-3.2.2**: Implement test ordering workflow (PARTIAL)
 - ⭕ **MT-3.2.3**: Build sample collection tracking
 - ⭕ **MT-3.2.4**: Create result entry interface
 - ⭕ **MT-3.2.5**: Implement result verification system
@@ -259,10 +259,10 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ## 📊 Overall Progress
 - **Phase 1**: 100% Complete (40/40 microtasks)
 - **Phase 2**: 45% Complete (11/24 microtasks) 
-- **Phase 3**: 10% Complete (2/24 microtasks)
+- **Phase 3**: 12.5% Complete (3/24 microtasks)
 - **Phase 4**: 15% Complete (5/32 microtasks)
 
-**Total Project Progress**: 48% Complete (58/120 microtasks)
+**Total Project Progress**: 49% Complete (59/120 microtasks)
 
 ---
 
